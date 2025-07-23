@@ -63,7 +63,7 @@ build-cluster-api-provider-azure-chart:
 	WKDIR="$(WKDIR)" \
 	ORGREPO="https://github.com/marek-veber" \
 	PROJECT="cluster-api-provider-azure" \
-	BRANCH="ARO-mara" \
+	BRANCH="ARO-webhooks" \
 	../scripts/build.sh
 	BUILTDIR="$(WKDIR)/cluster-api-provider-azure/config/tmp" \
 	CHART_VERSION="$(OCP_VERSION)" \

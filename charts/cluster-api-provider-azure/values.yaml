@@ -2,5 +2,5 @@ aso:
   crdPattern: "resources.azure.com/*;containerservice.azure.com/*;keyvault.azure.com/*;managedidentity.azure.com/*;eventhub.azure.com/*;network.azure.com/*;authorization.azure.com/*"
 manager:
   image:
-    tag: dev.2
+    tag: dev.3
     url: quay.io/mveber/cluster-api-azure-controller-amd64
