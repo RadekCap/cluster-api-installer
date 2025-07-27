@@ -49,10 +49,11 @@ OPERATORS_UAMIS_SUFFIX_FILE=operators-uamis-suffix.txt
 if [ ! -f "$OPERATORS_UAMIS_SUFFIX_FILE" ] ; then
     openssl rand -hex 3 > "$OPERATORS_UAMIS_SUFFIX_FILE"
 fi
-OPERATORS_UAMIS_SUFFIX=$(cat "$OPERATORS_UAMIS_SUFFIX_FILE")
+export OPERATORS_UAMIS_SUFFIX=$(cat "$OPERATORS_UAMIS_SUFFIX_FILE")
 
 export VNET="$NAME_PREFIX-vnet"
 export SUBNET="$NAME_PREFIX-subnet"
+export NSG="$NAME_PREFIX-nsg"
 
 
 # Settings needed for AzureClusterIdentity used by the AzureCluster
