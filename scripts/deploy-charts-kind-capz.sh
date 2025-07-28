@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 #PROJECT_ONLY=cluster-api-provider-azure
+KIND_CLUSTER_NAME=aso2
 
-if ! (kind get clusters 2>/dev/null|grep -q '^aso2$') ; then 
-    kind create cluster --name aso2
+if ! (kind get clusters 2>/dev/null|grep -q '^'"$KIND_CLUSTER_NAME"'$') ; then 
+    kind create cluster --name "$KIND_CLUSTER_NAME"
     helm repo add jetstack https://charts.jetstack.io --force-update
     helm repo update
     helm upgrade --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set crds.enabled=true --wait --timeout 5m
