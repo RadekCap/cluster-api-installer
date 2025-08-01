@@ -168,19 +168,19 @@ spec:
     vmSize: "Standard_D4s_v3"
     diskSizeGiB: 128
     diskStorageAccountType: "Premium_LRS"
-labels:
-   region: \${REGION}
-taints:
-  - key: "example.com/special"
-    value: "true"
-    effect: "NoSchedule"
-additionalTags:
-  environment: production
-  cost-center: engineering
-autoRepair: true
-autoscaling:
-  minReplicas: 2
-  maxReplicas: 4
+  labels:
+     region: \${REGION}
+  taints:
+    - key: "example.com/special"
+      value: "true"
+      effect: "NoSchedule"
+  additionalTags:
+    environment: production
+    cost-center: engineering
+  autoRepair: true
+  autoscaling:
+    minReplicas: 2
+    maxReplicas: 4
 ---
 apiVersion: cluster.x-k8s.io/v1beta2
 kind: MachinePool
