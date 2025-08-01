@@ -2,6 +2,7 @@
 if [ -n "$1" ] ; then
     GEN_OUTPUT="$1"; shift
 fi
+
 # export OICD_RESOURCE_GROUP=mveber-oidc-issuer
 # export USER_ASSIGNED_IDENTITY_ASO=mveber-aso-tests
 # export USER_ASSIGNED_IDENTITY_ARO=mveber-aro-tests
@@ -9,17 +10,19 @@ fi
 
 TEMPLATE_FILE=$(dirname $0)/aro-template.yaml
 
-# az cli
 export AZURE_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
 export AZURE_SUBSCRIPTION_NAME=$(az account show --query name --output tsv)
-export USER=${USER:-user1}
-export CS_CLUSTER_NAME=${CS_CLUSTER_NAME:-$USER-aro}
-export NAME_PREFIX=${NAME_PREFIX:-aro-hcp}
-export RESOURCEGROUPNAME="$USER-$CS_CLUSTER_NAME-$NAME_PREFIX-resgroup"
+export ENV=dev
+[ "$AZURE_SUBSCRIPTION_NAME" == "ARO SRE Team - INT (EA Subscription 3)"    ] && export REGION=${REGION:-uksouth} && export ENV=int
+[ "$AZURE_SUBSCRIPTION_NAME" == "ARO HCP - STAGE testing (EA Subscription)" ] && export REGION=${REGION:-uksouth} && export ENV=stage
 
-[ "$AZURE_SUBSCRIPTION_NAME" == "ARO SRE Team - INT (EA Subscription 3)"    ] && export REGION=${REGION:-uksouth}
-[ "$AZURE_SUBSCRIPTION_NAME" == "ARO HCP - STAGE testing (EA Subscription)" ] && export REGION=${REGION:-uksouth}
+export USER=${USER:-user1}
+export CS_CLUSTER_NAME=${CS_CLUSTER_NAME:-$USER-$ENV}
+export NAME_PREFIX=${NAME_PREFIX:-aro-$ENV}
+export RESOURCEGROUPNAME="$CS_CLUSTER_NAME-resgroup"
+export OCP_VERSION=${OCP_VERSION:-openshift-v4.19.0}
 export REGION=${REGION:-westus3}
+
 if [ -n "$OICD_RESOURCE_GROUP" ] ; then
     export AZURE_ASO_TENANT_ID=$(az identity show --query tenantId --output=tsv --resource-group="${OICD_RESOURCE_GROUP}" --name="${USER_ASSIGNED_IDENTITY_ASO}")
     export AZURE_ASO_CLIENT_ID=$(az identity show --query clientId --output=tsv --resource-group="${OICD_RESOURCE_GROUP}" --name="${USER_ASSIGNED_IDENTITY_ASO}")
@@ -43,7 +46,6 @@ else
     export AZURE_CLIENT_SECRET=$(jq -r .password "$SP_JSON_FILE")
     export CREATE_AZURE_CLUSTER_IDENTITY=true
 fi
-export OCP_VERSION=${OCP_VERSION:-openshift-v4.19.0}
 
 OPERATORS_UAMIS_SUFFIX_FILE=operators-uamis-suffix.txt
 if [ ! -f "$OPERATORS_UAMIS_SUFFIX_FILE" ] ; then
@@ -55,17 +57,17 @@ export VNET="$NAME_PREFIX-vnet"
 export SUBNET="$NAME_PREFIX-subnet"
 export NSG="$NAME_PREFIX-nsg"
 
-
 # Settings needed for AzureClusterIdentity used by the AzureCluster
 export AZURE_CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_NAMESPACE="default"
 if [ -n "${AZURE_CLIENT_SECRET}" ] ; then
     export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
     export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
-    oc create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}" --namespace "${AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE}"
+    export AZURE_CLUSTER_IDENTITY_SECRET_BASE64=$(echo -n "$AZURE_CLIENT_SECRET"|base64)
 fi
 
 
+echo ENV=$ENV - AZURE_SUBSCRIPTION_NAME=${AZURE_SUBSCRIPTION_NAME}
 echo AZURE_TENANT_ID=${AZURE_TENANT_ID}
 echo AZURE_CLIENT_ID=${AZURE_CLIENT_ID} AZURE_ASO_CLIENT_ID=${AZURE_ASO_CLIENT_ID} 
 if [ -n "$CREATE_AZURE_CLUSTER_IDENTITY" ] ; then
@@ -115,6 +117,15 @@ cat <<EOF
     name: ${AZURE_CLUSTER_IDENTITY_SECRET_NAME}
     namespace: ${AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE}
   type: "ServicePrincipal" # "ServicePrincipal", "UserAssignedMSI", "ManualServicePrincipal", "ServicePrincipalCertificate", "WorkloadIdentity", "UserAssignedIdentityCredential"
+---
+apiVersion: v1
+data:
+  clientSecret: ${AZURE_CLUSTER_IDENTITY_SECRET_BASE64}
+kind: Secret
+metadata:
+  name: ${AZURE_CLUSTER_IDENTITY_SECRET_NAME}
+  namespace: ${AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE}
+type: Opaque
 ---
 apiVersion: v1
 kind: Secret

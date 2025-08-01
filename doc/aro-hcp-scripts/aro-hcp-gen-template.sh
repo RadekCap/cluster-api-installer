@@ -56,7 +56,7 @@ spec:
     name: \${VNET}
   addressPrefix: 10.100.76.0/24
   azureName: \${SUBNET}
-  networkSecurityGroup: 
+  networkSecurityGroup:
     reference:
       name: \${NSG}
       group: network.azure.com
@@ -79,7 +79,7 @@ for IDENTITY_NAME in \
     \${USER}-\${CS_CLUSTER_NAME}-dp-file-csi-driver-\${OPERATORS_UAMIS_SUFFIX} \
     \
     \${USER}-\${CS_CLUSTER_NAME}-service-managed-identity-\${OPERATORS_UAMIS_SUFFIX} \
-; do 
+; do
 cat >> $OUT_FILE <<EOF
 ---
 # Equivalent to:
@@ -94,6 +94,14 @@ spec:
   location: \${REGION}
   owner:
     name: \${RESOURCEGROUPNAME}
+  operatorSpec:
+    configMaps:
+      principalId:
+        name: identity-map-$IDENTITY_NAME
+        key: principalId
+      clientId:
+        name: identity-map-$IDENTITY_NAME
+        key: clientId
 EOF
 done
 
@@ -122,7 +130,7 @@ spec:
        fileCsiDriverManagedIdentities: "/subscriptions/\${AZURE_SUBSCRIPTION_ID}/resourcegroups/\${RESOURCEGROUPNAME}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/\${USER}-\${CS_CLUSTER_NAME}-cp-file-csi-driver-\${OPERATORS_UAMIS_SUFFIX}"
        imageRegistryManagedIdentities: "/subscriptions/\${AZURE_SUBSCRIPTION_ID}/resourcegroups/\${RESOURCEGROUPNAME}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/\${USER}-\${CS_CLUSTER_NAME}-cp-image-registry-\${OPERATORS_UAMIS_SUFFIX}"
        ingressManagedIdentities: "/subscriptions/\${AZURE_SUBSCRIPTION_ID}/resourcegroups/\${RESOURCEGROUPNAME}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/\${USER}-\${CS_CLUSTER_NAME}-cp-ingress-\${OPERATORS_UAMIS_SUFFIX}"
-       kmsManagedIdentities: "/subscriptions/\${AZURE_SUBSCRIPTION_ID}/resourcegroups/\${RESOURCEGROUPNAME}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/\${USER}-\${CS_CLUSTER_NAME}-cp-kms-\${OPERATORS_UAMIS_SUFFIX}"                           
+       kmsManagedIdentities: "/subscriptions/\${AZURE_SUBSCRIPTION_ID}/resourcegroups/\${RESOURCEGROUPNAME}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/\${USER}-\${CS_CLUSTER_NAME}-cp-kms-\${OPERATORS_UAMIS_SUFFIX}"
      dataPlaneOperators:
        diskCsiDriverManagedIdentities: "/subscriptions/\${AZURE_SUBSCRIPTION_ID}/resourcegroups/\${RESOURCEGROUPNAME}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/\${USER}-\${CS_CLUSTER_NAME}-dp-disk-csi-driver-\${OPERATORS_UAMIS_SUFFIX}"
        fileCsiDriverManagedIdentities: "/subscriptions/\${AZURE_SUBSCRIPTION_ID}/resourcegroups/\${RESOURCEGROUPNAME}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/\${USER}-\${CS_CLUSTER_NAME}-dp-file-csi-driver-\${OPERATORS_UAMIS_SUFFIX}"
@@ -209,8 +217,8 @@ metadata:
 spec:
 ---
 apiVersion: cluster.x-k8s.io/v1beta2
-kind: Cluster                                                                                                                                                                                                                                
-metadata:                                                                                                                                                                                                                                    
+kind: Cluster
+metadata:
   name: \${CS_CLUSTER_NAME}
   namespace: default
 spec:
