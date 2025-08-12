@@ -149,7 +149,6 @@ spec:
           httpGet:
             path: /healthz
             port: 8081
-          initialDelaySeconds: 60
         name: manager
         ports:
         - containerPort: 9443
@@ -165,7 +164,6 @@ spec:
           httpGet:
             path: /readyz
             port: 8081
-          initialDelaySeconds: 60
         resources:
           limits:
             cpu: 500m
@@ -182,6 +180,12 @@ spec:
           runAsGroup: 65532
           runAsNonRoot: true
           runAsUser: 65532
+        startupProbe:
+          failureThreshold: 12
+          httpGet:
+            path: /healthz
+            port: 8081
+          periodSeconds: 10
         volumeMounts:
         - mountPath: /var/run/secrets/tokens
           name: azure-identity

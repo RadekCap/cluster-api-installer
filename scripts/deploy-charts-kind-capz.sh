@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-KIND_CLUSTER_NAME=aso2
-KUBECTL_CONTEXT="kind-$KIND_CLUSTER_NAME"
+KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-aso2}
+KUBE_CONTEXT="--context=kind-$KIND_CLUSTER_NAME"
 
 if ! (kind get clusters 2>/dev/null|grep -q '^'"$KIND_CLUSTER_NAME"'$') ; then 
     kind create cluster --name "$KIND_CLUSTER_NAME"
@@ -17,7 +17,7 @@ for CHART in charts/cluster-api \
     PROJECT=${CHART#charts/}
     [ -z "$PROJECT_ONLY" -o "$PROJECT_ONLY" == "$PROJECT" ] || continue
     echo ========= deploy: $CHART
-    helm template $CHART --include-crds|kubectl --context "$KUBECTL_CONTEXT" apply -f - --server-side --force-conflicts
+    helm template $CHART --include-crds|kubectl $KUBE_CONTEXT apply -f - --server-side --force-conflicts
     echo
 done
 
@@ -31,9 +31,9 @@ for T in capi capz; do
     esac
     [ -z "$PROJECT_ONLY" -o "$PROJECT_ONLY" == "$PROJECT" ] || continue
     echo "Waiting for ${T} controller:"
-    kubectl --context "$KUBECTL_CONTEXT" events -n ${T}-system --watch &
+    kubectl $KUBE_CONTEXT events -n ${T}-system --watch &
     CH_PID=$!
-    kubectl --context "$KUBECTL_CONTEXT" -n ${T}-system wait deployment/${T}-controller-manager --for condition=Available=True  --timeout=10m
+    kubectl $KUBE_CONTEXT -n ${T}-system wait deployment/${T}-controller-manager --for condition=Available=True  --timeout=10m
     kill $CH_PID
     echo
 done

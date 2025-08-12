@@ -27,7 +27,7 @@ spec:
         - --diagnostics-address=:8443
         - --insecure-diagnostics=false
         - --feature-gates=MachinePool=true,AKSResourceHealth=false,EdgeZone=false,ASOAPI=true,APIServerILB=false,ARO=true
-        - --v=5
+        - --v=0
         env:
         - name: AZURE_SUBSCRIPTION_ID
           valueFrom:

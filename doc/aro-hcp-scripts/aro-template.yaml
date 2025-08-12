@@ -853,7 +853,7 @@ metadata:
  namespace: default
 spec:
   nodePoolName: w-${REGION}-mp-0
-  version: "${OCP_VERSION}"
+  version: "${OCP_VERSION_MP}"
   platform:
     subnet: "/subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/${RESOURCEGROUPNAME}/providers/Microsoft.Network/virtualNetworks/${VNET}/subnets/${SUBNET}"
     vmSize: "Standard_D4s_v3"
