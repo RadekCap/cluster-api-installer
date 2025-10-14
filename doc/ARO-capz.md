@@ -30,7 +30,7 @@ cd cluster-api-installer-aro
 
 2. The next command will prepare an instance of a kind cluster (with cert manager, CAPI, CAPZ and ASO):
 ```
-KIND_CLUSTER_NAME=capz-prod ./scripts/deploy-charts-kind-capz.sh
+KIND_CLUSTER_NAME=capz-prod ./scripts/deploy-charts-kind-capz.sh aro-stage
 ```
 
 3. Edit the variables in the script (if needed): ./doc/aro-hcp-scripts/aro-hcp-gen.sh
