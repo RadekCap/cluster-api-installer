@@ -24,13 +24,13 @@ We expect the following:
 
 1. Check out the deployment:
 ```
-git clone -b ARO https://github.com/marek-veber/cluster-api-installer.git cluster-api-installer-aro
+git clone -b ARO-ASO https://github.com/marek-veber/cluster-api-installer.git cluster-api-installer-aro
 cd cluster-api-installer-aro
 ```
 
 2. The next command will prepare an instance of a kind cluster (with cert manager, CAPI, CAPZ and ASO):
 ```
-KIND_CLUSTER_NAME=capz-prod ./scripts/deploy-charts-kind-capz.sh aro-stage
+KIND_CLUSTER_NAME=capz-stage ./scripts/deploy-charts-kind-capz.sh
 ```
 
 3. Edit the variables in the script (if needed): ./doc/aro-hcp-scripts/aro-hcp-gen.sh
@@ -51,8 +51,16 @@ export REGION=${REGION:-westus3}
    * `aro-stage/credentials.yaml` - `Secret/aso-secret` & `AzureClusterIdentity/cluster-identity` & `Secret/cluster-identity-secret`
    * `aro-stage/is.yaml` - Infrastructure required for ARO HCP cluster: `ResourceGroup`, `NetworkSecurityGroup`, `VirtualNetwork`, `VirtualNetworksSubnet`, `Vault`, `UserAssignedIdentity`s, `RoleAssignment`s
    * `aro-stage/aro.yaml` - `AROControlPlane`, `AROCluster`, `Cluster`, `AROMachinePool` and `MachinePool`
+
+Simple deployment for stage:
 ```
-REGION="switzerlandnorth" USER=mveber4 ENV=prod AZURE_SUBSCRIPTION_NAME="974ebd46-8ad3-41e3-afef-7ef25fd5c371" ./doc/aro-hcp-scripts/aro-hcp-gen.sh aro-prod
+ENV=stage ./doc/aro-hcp-scripts/aro-hcp-gen.sh aro-stage
+```
+
+For pruduction we can use e.g.:
+```
+REGION="switzerlandnorth" USER=mveber4 AZURE_SUBSCRIPTION_NAME="974ebd46-8ad3-41e3-afef-7ef25fd5c371" \
+ENV=prod ./doc/aro-hcp-scripts/aro-hcp-gen.sh aro-prod
 ```
 
 5. Apply the YAML files with resources (YAMLs from the directory in the specified order):

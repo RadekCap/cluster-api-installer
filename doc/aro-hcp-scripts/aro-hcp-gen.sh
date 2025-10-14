@@ -79,6 +79,7 @@ export VNET="$NAME_PREFIX-vnet"
 export SUBNET="$NAME_PREFIX-subnet"
 export NSG="$NAME_PREFIX-nsg"
 export KV="$NAME_PREFIX-kv"
+export KV_VERSION="40037529f72042cbb4f69ddb97b8bced"
 
 # Settings needed for AzureClusterIdentity used by the AzureCluster
 export AZURE_CLUSTER_IDENTITY_NAME="cluster-identity"
@@ -107,11 +108,17 @@ if [ -n "$CREATE_CREDENTIALS" ] ; then
 fi
 
 TEMPLATE_FILE_ARO=$(dirname $0)/aro-template.yaml
-TEMPLATE_FILE_ASO=$(dirname $0)/is-template.yaml
+TEMPLATE_FILE_IS=$(dirname $0)/is-template.yaml
 
 
 echo creating: "$GEN_OUTPUT/is.yaml"
-envsubst  < $TEMPLATE_FILE_ASO > "$GEN_OUTPUT/is.yaml"
+envsubst  < $TEMPLATE_FILE_IS > "$GEN_OUTPUT/is.yaml"
 
-echo creating: "$GEN_OUTPUT/aro.yaml"
-envsubst  < $TEMPLATE_FILE_ARO > "$GEN_OUTPUT/aro.yaml"
+if [ -z "$GEN_ASO" ] ; then
+    echo creating: "$GEN_OUTPUT/aro.yaml"
+    envsubst  < $TEMPLATE_FILE_ARO > "$GEN_OUTPUT/aro.yaml"
+else
+    TEMPLATE_FILE_ASO=$(dirname $0)/aro-aso-template.yaml
+    echo creating: "$GEN_OUTPUT/aro-aso.yaml"
+    envsubst  < $TEMPLATE_FILE_ASO > "$GEN_OUTPUT/aro-aso.yaml"
+fi

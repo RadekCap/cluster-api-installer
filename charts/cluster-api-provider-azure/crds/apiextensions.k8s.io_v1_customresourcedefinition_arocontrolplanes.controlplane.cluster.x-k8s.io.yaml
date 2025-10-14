@@ -99,6 +99,8 @@ spec:
                 - stable
                 - candidate
                 - nightly
+                - fast
+                - eus
                 type: string
               domainPrefix:
                 description: |-

@@ -3,10 +3,10 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: capz-system/azureserviceoperator-serving-cert
-    controller-gen.kubebuilder.io/version: v0.16.3
+    controller-gen.kubebuilder.io/version: v0.18.0
   labels:
     app.kubernetes.io/name: azure-service-operator
-    app.kubernetes.io/version: v2.11.0
+    app.kubernetes.io/version: v2.13.0-hcpclusters
     visualizer.cluster.x-k8s.io: ""
     visualizer.cluster.x-k8s.io/provider-type: infrastructure
   name: virtualnetworkssubnets.network.azure.com
@@ -507,8 +507,9 @@ spec:
                   type: object
                 type: array
               ipConfigurations:
-                description: 'IpConfigurations: An array of references to the network
-                  interface IP configurations using subnet.'
+                description: |-
+                  IpConfigurations: An array of references to the network interface IP configurations using subnet. This field is not
+                  included if there are more than 2000 entries.
                 items:
                   description: IP configuration.
                   properties:
@@ -1869,8 +1870,9 @@ spec:
                   type: object
                 type: array
               ipConfigurations:
-                description: 'IpConfigurations: An array of references to the network
-                  interface IP configurations using subnet.'
+                description: |-
+                  IpConfigurations: An array of references to the network interface IP configurations using subnet. This field is not
+                  included if there are more than 2000 entries.
                 items:
                   description: IP configuration.
                   properties:
