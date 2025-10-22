@@ -80,7 +80,7 @@ watch -n 5 --color --no-wrap ./bin/clusterctl describe cluster "<your-cluster-na
 7. You can get the kubeconfig for the provisioned cluster:
   * Using `oc` and `base64`:
     ```
-    oc get secret mveber-stage-kubeconfig -o jsonpath='{.data.value}' | base64 -d > /tmp/kc.yamli
+    oc get secret mveber-stage-kubeconfig -o jsonpath='{.data.value}' | base64 -d > /tmp/kc.yaml
     ```
   * Or using `clusterctl`:
     ```
