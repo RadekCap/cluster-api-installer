@@ -5,7 +5,7 @@ apiVersion: resources.azure.com/v1api20200601
 kind: ResourceGroup
 metadata:
   name: ${RESOURCEGROUPNAME}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
 ---
@@ -16,7 +16,7 @@ apiVersion: network.azure.com/v1api20201101
 kind: VirtualNetwork
 metadata:
   name: ${VNET}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -32,7 +32,7 @@ apiVersion: network.azure.com/v1api20201101
 kind: NetworkSecurityGroup
 metadata:
   name: ${NSG}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -45,7 +45,7 @@ apiVersion: network.azure.com/v1api20201101
 kind: VirtualNetworksSubnet
 metadata:
   name: ${VNET}-${SUBNET}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}
@@ -64,7 +64,7 @@ apiVersion: keyvault.azure.com/v1api20230701
 kind: Vault
 metadata:
   name: "${KV}"
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: "${REGION}"
   owner:
@@ -88,7 +88,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-control-plane-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -109,7 +109,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-cluster-api-azure-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -130,7 +130,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-cloud-controller-manager-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -151,7 +151,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-ingress-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -172,7 +172,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-disk-csi-driver-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -193,7 +193,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-file-csi-driver-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -214,7 +214,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-image-registry-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -235,7 +235,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-cloud-network-config-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -256,7 +256,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-kms-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -277,7 +277,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-dp-disk-csi-driver-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -298,7 +298,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-dp-image-registry-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -319,7 +319,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-dp-file-csi-driver-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -340,7 +340,7 @@ apiVersion: managedidentity.azure.com/v1api20230131
 kind: UserAssignedIdentity
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   location: ${REGION}
   owner:
@@ -358,7 +358,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-cluster-api-azure-${OPERATORS_UAMIS_SUFFIX}-hcpclusterapiproviderroleid-subnet
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}-${SUBNET}
@@ -376,7 +376,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-readerroleid-clusterapiazuremi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-cp-cluster-api-azure-${OPERATORS_UAMIS_SUFFIX}
@@ -394,7 +394,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-kms-${OPERATORS_UAMIS_SUFFIX}-keyvaultcryptouserroleid-keyvault
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${KV}
@@ -412,7 +412,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-readerroleid-kmsmi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-cp-kms-${OPERATORS_UAMIS_SUFFIX}
@@ -430,7 +430,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-control-plane-${OPERATORS_UAMIS_SUFFIX}-hcpcontrolplaneoperatorroleid-vnet
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}
@@ -448,7 +448,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-control-plane-${OPERATORS_UAMIS_SUFFIX}-hcpcontrolplaneoperatorroleid-nsg
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${NSG}
@@ -466,7 +466,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-readerroleid-controlplanemi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-cp-control-plane-${OPERATORS_UAMIS_SUFFIX}
@@ -484,7 +484,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-cloud-controller-manager-${OPERATORS_UAMIS_SUFFIX}-cloudcontrollermanagerroleid-subnet
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}-${SUBNET}
@@ -502,7 +502,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-cloud-controller-manager-${OPERATORS_UAMIS_SUFFIX}-cloudcontrollermanagerroleid-nsg
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${NSG}
@@ -520,7 +520,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-readerroleid-cloudcontrollermanagermi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-cp-cloud-controller-manager-${OPERATORS_UAMIS_SUFFIX}
@@ -538,7 +538,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-ingress-${OPERATORS_UAMIS_SUFFIX}-ingressoperatorroleid-subnet
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}-${SUBNET}
@@ -556,7 +556,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-readerroleid-ingressmi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-cp-ingress-${OPERATORS_UAMIS_SUFFIX}
@@ -574,7 +574,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-readerroleid-diskcsidrivermi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-cp-disk-csi-driver-${OPERATORS_UAMIS_SUFFIX}
@@ -592,7 +592,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-file-csi-driver-${OPERATORS_UAMIS_SUFFIX}-filestorageoperatorroleid-subnet
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}-${SUBNET}
@@ -610,7 +610,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-file-csi-driver-${OPERATORS_UAMIS_SUFFIX}-filestorageoperatorroleid-nsg
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${NSG}
@@ -628,7 +628,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-readerroleid-filecsidrivermi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-cp-file-csi-driver-${OPERATORS_UAMIS_SUFFIX}
@@ -646,7 +646,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-readerroleid-imageregistrymi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-cp-image-registry-${OPERATORS_UAMIS_SUFFIX}
@@ -664,7 +664,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-cloud-network-config-${OPERATORS_UAMIS_SUFFIX}-networkoperatorroleid-subnet
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}-${SUBNET}
@@ -682,7 +682,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-cp-cloud-network-config-${OPERATORS_UAMIS_SUFFIX}-networkoperatorroleid-vnet
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}
@@ -700,7 +700,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-readerroleid-cloudnetworkconfigmi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-cp-cloud-network-config-${OPERATORS_UAMIS_SUFFIX}
@@ -718,7 +718,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-federatedcredentialsroleid-dpdiskcsidrivermi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-dp-disk-csi-driver-${OPERATORS_UAMIS_SUFFIX}
@@ -736,7 +736,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-federatedcredentialsroleid-dpfilecsidrivermi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-dp-file-csi-driver-${OPERATORS_UAMIS_SUFFIX}
@@ -754,7 +754,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-dp-file-csi-driver-${OPERATORS_UAMIS_SUFFIX}-filestorageoperatorroleid-subnet
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}-${SUBNET}
@@ -772,7 +772,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-dp-file-csi-driver-${OPERATORS_UAMIS_SUFFIX}-filestorageoperatorroleid-nsg
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${NSG}
@@ -790,7 +790,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-federatedcredentialsroleid-dpimageregistrymi
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${USER}-${CS_CLUSTER_NAME}-dp-image-registry-${OPERATORS_UAMIS_SUFFIX}
@@ -808,7 +808,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-hcpservicemanagedidentityroleid-vnet
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}
@@ -826,7 +826,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-hcpservicemanagedidentityroleid-subnet
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${VNET}-${SUBNET}
@@ -844,7 +844,7 @@ apiVersion: authorization.azure.com/v1api20220401
 kind: RoleAssignment
 metadata:
   name: ${USER}-${CS_CLUSTER_NAME}-service-managed-identity-${OPERATORS_UAMIS_SUFFIX}-hcpservicemanagedidentityroleid-nsg
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   owner:
     name: ${NSG}

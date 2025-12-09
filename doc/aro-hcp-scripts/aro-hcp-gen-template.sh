@@ -700,10 +700,10 @@ spec:
     diskStorageAccountType: "Premium_LRS"
   labels:
      region: \${REGION}
-  taints:
-    - key: "example.com/special"
-      value: "true"
-      effect: "NoSchedule"
+  # taints:
+  #   - key: "example.com/special"
+  #     value: "true"
+  #     effect: "NoSchedule"
   additionalTags:
     environment: production
     cost-center: engineering
