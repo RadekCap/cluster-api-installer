@@ -115,3 +115,14 @@ patches:
 #       - op: add
 #         path: /metadata/annotations/service.beta.openshift.io~1serving-cert-secret-name
 #         value: capa-webhook-service-cert
+  - target:
+      version: v1
+      kind: Deployment
+      name: azureserviceoperator-controller-manager
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: '{{ .Values.aso.image.url  }}:{{ .Values.aso.image.tag  }}'
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Always

@@ -131,13 +131,29 @@ patches:
         value: '{{ .Values.manager.image.url  }}:{{ .Values.manager.image.tag  }}'
       - op: replace
         path: /spec/template/spec/containers/0/imagePullPolicy
-        value: IfNotPresent
+        value: Always
       - op: remove
         path: /spec/template/spec/containers/0/securityContext/runAsUser
       - op: remove
         path: /spec/template/spec/containers/0/securityContext/runAsGroup
       # - op: remove
       #   path: /spec/template/spec/securityContext/fsGroup
+  # Remove runAsUser and runAsGroup from Azure Service Operator deployment for OCP compatibility
+  - target:
+      version: v1
+      kind: Deployment
+      name: azureserviceoperator-controller-manager
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: '{{ .Values.aso.image.url  }}:{{ .Values.aso.image.tag  }}'
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Always
+      - op: remove
+        path: /spec/template/spec/containers/0/securityContext/runAsUser
+      - op: remove
+        path: /spec/template/spec/containers/0/securityContext/runAsGroup
   # Add OCP cert service annotation
   - target:
       kind: Service
