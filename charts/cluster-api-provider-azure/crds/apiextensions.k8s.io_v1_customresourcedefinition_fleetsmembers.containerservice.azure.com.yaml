@@ -11,6 +11,17 @@ metadata:
     visualizer.cluster.x-k8s.io/provider-type: infrastructure
   name: fleetsmembers.containerservice.azure.com
 spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        service:
+          name: azureserviceoperator-webhook-service
+          namespace: capz-system
+          path: /convert
+          port: 443
+      conversionReviewVersions:
+      - v1
   group: containerservice.azure.com
   names:
     kind: FleetsMember

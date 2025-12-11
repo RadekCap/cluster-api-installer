@@ -94,7 +94,7 @@ patches:
   - target:
       version: v1
       kind: Service
-      name: capi-webhook-service
+      name: capa-webhook-service
     patch: |-
       - op: add
         path: /metadata/annotations/service.beta.openshift.io~1inject-cabundle

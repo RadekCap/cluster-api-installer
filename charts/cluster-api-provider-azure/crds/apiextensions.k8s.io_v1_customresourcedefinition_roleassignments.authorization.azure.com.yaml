@@ -9,6 +9,17 @@ metadata:
     app.kubernetes.io/version: v2.13.0-hcpclusters.1
   name: roleassignments.authorization.azure.com
 spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        service:
+          name: azureserviceoperator-webhook-service
+          namespace: capz-system
+          path: /convert
+          port: 443
+      conversionReviewVersions:
+      - v1
   group: authorization.azure.com
   names:
     kind: RoleAssignment
