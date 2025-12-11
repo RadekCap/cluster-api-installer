@@ -141,8 +141,8 @@ patches:
   # Add OCP cert service annotation
   - target:
       kind: Service
-      name: capa-webhook-service
+      name: capz-webhook-service
     patch: |-
       - op: add
         path: /metadata/annotations/service.beta.openshift.io~1serving-cert-secret-name
-        value: capa-webhook-service-cert
+        value: capz-webhook-service-cert
