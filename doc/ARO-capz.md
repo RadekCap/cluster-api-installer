@@ -92,4 +92,22 @@ watch -n 5 --color --no-wrap ./bin/clusterctl describe cluster "<your-cluster-na
 KUBECONFIG=/tmp/kc.yaml oc get nodes
 ```
 
+## External Authentication Configuration
+
+If your ARO cluster is configured with External Authentication (Azure AD integration), you need to run the post-deployment configuration script to complete the setup:
+
+9. Run the External Authentication post-deployment script:
+```
+./doc/aro-hcp-scripts/ea-post-deploy-update.sh aro-stage/aro.yaml
+```
+
+This script will:
+* Extract cluster information and External Auth configuration from your aro.yaml
+* Update the Azure AD application with the correct redirect URIs
+* Enable ID token issuance and configure group claims
+* Create required secrets for console authentication on both management and workload clusters
+* Set up cluster role bindings for your user and the engineering group
+
+**Note**: This step is only required for clusters using External Authentication. Skip this if you're using standard cluster authentication.
+
 

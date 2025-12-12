@@ -17,6 +17,7 @@ if [ "$KIND_CLUSTER_NAME" == "capz-mveber-int" ] ; then
     export ENV=int
 fi
 export KUBE_CONTEXT="--context=kind-$KIND_CLUSTER_NAME"
+export NAMESPACE=${NAMESPACE:-default}
 
 
 if [ "$ENV" == int ] ; then
@@ -35,6 +36,8 @@ if [ -z "$AZURE_SUBSCRIPTION_ID" ]; then
     exit 1
 fi
 export AZURE_SUBSCRIPTION_NAME=$(az account show --query name --output tsv --subscription "$AZURE_SUBSCRIPTION_NAME")
+
+echo "AZURE_SUBSCRIPTION_NAME=$AZURE_SUBSCRIPTION_NAME <$AZURE_SUBSCRIPTION_ID>"
 
 export USER=${USER:-user1}
 export CS_CLUSTER_NAME=${CS_CLUSTER_NAME:-$USER-$ENV}
@@ -64,6 +67,13 @@ else
         echo "Creating SP for RBAC with name $servicePrincipalName, with role $roleName and in scopes /subscriptions/$AZURE_SUBSCRIPTION_ID"
         az ad sp create-for-rbac --name "$servicePrincipalName" --role "$roleName" --scopes "/subscriptions/$AZURE_SUBSCRIPTION_ID" > "$SP_JSON_FILE"
     fi
+    if [ -n "${ASSIGN_ROLE_SP}" ] ; then
+        roleName="Custom-Owner (Block Billing and Subscription deletion)"
+        export ASSIGN_ROLE_SP_NAME=$(jq -r .displayName "$SP_JSON_FILE")
+        ASSIGN_ROLE_SP_ID=$(az ad sp list --output=json  --display-name mveber-sp-468528336 |jq -r '.[0].id')
+        echo "assign ASSIGN_ROLE_SP_NAME=$ASSIGN_ROLE_SP_NAME to scope /subscriptions/$AZURE_SUBSCRIPTION_ID"
+        az role assignment create --assignee  "${ASSIGN_ROLE_SP_ID}" --role "$roleName" --scope "/subscriptions/${AZURE_SUBSCRIPTION_ID}"
+    fi
     export AZURE_TENANT_ID=$(jq -r .tenant "$SP_JSON_FILE")
     export AZURE_CLIENT_ID=$(jq -r .appId "$SP_JSON_FILE")
     export AZURE_CLIENT_SECRET=$(jq -r .password "$SP_JSON_FILE")
@@ -83,13 +93,21 @@ export KV_VERSION="40037529f72042cbb4f69ddb97b8bced"
 
 # Settings needed for AzureClusterIdentity used by the AzureCluster
 export AZURE_CLUSTER_IDENTITY_NAME="cluster-identity"
-export AZURE_CLUSTER_IDENTITY_NAMESPACE="default"
+export AZURE_CLUSTER_IDENTITY_NAMESPACE="$NAMESPACE"
 if [ -n "${AZURE_CLIENT_SECRET}" ] ; then
     export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
-    export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
+    export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="$NAMESPACE"
     export AZURE_CLUSTER_IDENTITY_SECRET_BASE64=$(echo -n "$AZURE_CLIENT_SECRET"|base64)
 fi
 
+export USE_EA=${USE_EA:-true}
+export EA_OIDC_USERNAME_CLAIM=${OIDC_USERNAME_CLAIM:-oid}
+export EA_OIDC_GROUPS_CLAIM=${OIDC_GROUPS_CLAIM:-groups}
+export EA_OIDC_PROVIDER_NAME=${CS_CLUSTER_NAME}-ea
+export EA_AZURE_TENANT_ID=${AZURE_TENANT_ID}
+export EA_AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+export EA_DISABLE='#'
+[ "$USE_EA" == true ] || EA_DISABLE=''
 
 echo ENV=$ENV - AZURE_SUBSCRIPTION_NAME=${AZURE_SUBSCRIPTION_NAME} AZURE_SUBSCRIPTION_ID=${AZURE_SUBSCRIPTION_ID}
 echo AZURE_TENANT_ID=${AZURE_TENANT_ID}
@@ -119,6 +137,11 @@ if [ -z "$GEN_ASO" ] ; then
     envsubst  < $TEMPLATE_FILE_ARO > "$GEN_OUTPUT/aro.yaml"
 else
     TEMPLATE_FILE_ASO=$(dirname $0)/aro-aso-template.yaml
+    TEMPLATE_FILE_ASO_EA=$(dirname $0)/aro-aso-ea-template.yaml
     echo creating: "$GEN_OUTPUT/aro-aso.yaml"
     envsubst  < $TEMPLATE_FILE_ASO > "$GEN_OUTPUT/aro-aso.yaml"
+    if [ "$USE_EA" == true ] ; then
+        echo creating: "$GEN_OUTPUT/aro-ea.yaml"
+        envsubst  < $TEMPLATE_FILE_ASO_EA > "$GEN_OUTPUT/aro-ea.yaml"
+    fi
 fi

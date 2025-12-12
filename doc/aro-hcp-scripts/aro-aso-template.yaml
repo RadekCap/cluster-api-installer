@@ -3,7 +3,7 @@ apiVersion: redhatopenshift.azure.com/v1api20240610preview
 kind: HcpOpenShiftCluster
 metadata:
   name: ${CS_CLUSTER_NAME}
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   azureName: ${CS_CLUSTER_NAME}
   location: ${REGION}
@@ -112,7 +112,7 @@ apiVersion: redhatopenshift.azure.com/v1api20240610preview
 kind: HcpOpenShiftClustersNodePool
 metadata:
   name: ${CS_CLUSTER_NAME}-mp-0
-  namespace: default
+  namespace: ${NAMESPACE}
 spec:
   azureName: ${CS_CLUSTER_NAME}-mp-0
   location: ${REGION}
@@ -129,10 +129,10 @@ spec:
     labels:
       - key: region
         value: ${REGION}
-    taints:
-      - key: "example.com/special"
-        value: "true"
-        effect: "NoSchedule"
+    # taints:
+    #   - key: "example.com/special"
+    #     value: "true"
+    #     effect: "NoSchedule"
     platform:
       osDisk:
         diskStorageAccountType: "Standard_LRS"
