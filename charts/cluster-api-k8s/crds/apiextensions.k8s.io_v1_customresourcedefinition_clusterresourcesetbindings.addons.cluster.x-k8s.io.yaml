@@ -319,6 +319,10 @@ spec:
     subresources:
       status: {}
   - additionalPrinterColumns:
+    - description: Cluster
+      jsonPath: .spec.clusterName
+      name: Cluster
+      type: string
     - description: Time duration since creation of ClusterResourceSetBinding
       jsonPath: .metadata.creationTimestamp
       name: Age
@@ -405,11 +409,13 @@ spec:
                         type: object
                       maxItems: 100
                       type: array
+                      x-kubernetes-list-type: atomic
                   required:
                   - clusterResourceSetName
                   type: object
                 maxItems: 100
                 type: array
+                x-kubernetes-list-type: atomic
               clusterName:
                 description: clusterName is the name of the Cluster this binding applies
                   to.
@@ -419,8 +425,9 @@ spec:
             required:
             - clusterName
             type: object
+        required:
+        - spec
         type: object
     served: true
     storage: true
-    subresources:
-      status: {}
+    subresources: {}

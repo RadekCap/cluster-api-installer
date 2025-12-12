@@ -625,6 +625,15 @@ spec:
     subresources:
       status: {}
   - additionalPrinterColumns:
+    - description: Resource applied
+      jsonPath: .status.conditions[?(@.type=="ResourcesApplied")].status
+      name: Applied
+      type: string
+    - description: Reconciliation paused
+      jsonPath: .status.conditions[?(@.type=="Paused")].status
+      name: Paused
+      priority: 10
+      type: string
     - description: Time duration since creation of ClusterResourceSet
       jsonPath: .metadata.creationTimestamp
       name: Age
@@ -730,7 +739,9 @@ spec:
                   - name
                   type: object
                 maxItems: 100
+                minItems: 1
                 type: array
+                x-kubernetes-list-type: atomic
               strategy:
                 description: strategy is the strategy to be used during applying resources.
                   Defaults to ApplyOnce. This field is immutable.
@@ -740,9 +751,11 @@ spec:
                 type: string
             required:
             - clusterSelector
+            - resources
             type: object
           status:
             description: status is the observed state of ClusterResourceSet.
+            minProperties: 1
             properties:
               conditions:
                 description: |-
@@ -880,6 +893,8 @@ spec:
                 minimum: 1
                 type: integer
             type: object
+        required:
+        - spec
         type: object
     served: true
     storage: true

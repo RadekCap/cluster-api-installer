@@ -1,8 +1,8 @@
 manager:
   cmd: /manager
   image:
-    tag: v1.11.0-alpha.2
-    url: gcr.io/k8s-staging-cluster-api/cluster-api-controller
+    tag: v4.21
+    url: quay.io/mveber/ose-cluster-api-rhel9
 webhook:
   image:
     tag: latest

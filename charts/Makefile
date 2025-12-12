@@ -1,10 +1,10 @@
-OCP_VERSION ?= 4.20
+OCP_VERSION ?= 4.21
 MCE_VERSION ?= 2.11.0-0
 SYNC2CHARTS ?= true
 
-DEFAULT_BRANCH ?= release-4.20
+DEFAULT_BRANCH ?= release-4.21
 CAPA_BRANCH ?= backplane-2.10
-CAPZ_BRANCH ?= backplane-2.11
+CAPZ_BRANCH ?= backplane-2.11-fix-tests2
 CAPI_BRANCH=v1.11.0-alpha.2
 CAPI_REPO ?= https://github.com/kubernetes-sigs
 DEFAULT_ORGREPO ?= https://github.com/openshift
@@ -31,15 +31,15 @@ WKDIR ?= ../out
 build-cluster-api-chart:
 	@echo "Building cluster-api chart"
 	WKDIR="$(WKDIR)" \
-	ORGREPO="$(CAPI_REPO)" \
+	ORGREPO="$(DEFAULT_ORGREPO)" \
 	PROJECT="cluster-api" \
-	BRANCH="$(CAPI_BRANCH)" \
+	BRANCH="$(DEFAULT_BRANCH)" \
 	../scripts/build.sh
 	BUILTDIR="$(WKDIR)/cluster-api/config/tmp" \
 	CHART_VERSION="$(OCP_VERSION)" \
 	CHART_APP_VERSION="$(OCP_VERSION)" \
-	CHART_VALUES_IMAGE_TAG="$(CAPI_BRANCH)" \
-	CHART_VALUES_IMAGE_TAG_PREFIX="" \
+	CHART_VALUES_IMAGE_TAG="$(OCP_VERSION)" \
+	CHART_VALUES_IMAGE_TAG_PREFIX="v" \
 	SYNC2CHARTS="$(SYNC2CHARTS)" \
 	PROJECT="cluster-api" \
 	../scripts/sync2chart.sh
@@ -65,7 +65,7 @@ build-cluster-api-provider-aws-chart:
 build-cluster-api-provider-azure-chart:
 	@echo "Building cluster-api-provider-azure chart"
 	WKDIR="$(WKDIR)" \
-	ORGREPO="$(STOLOSTRON_ORGREPO)" \
+	ORGREPO="https://github.com/marek-veber" \
 	PROJECT="cluster-api-provider-azure" \
 	BRANCH="$(CAPZ_BRANCH)" \
 	../scripts/build.sh

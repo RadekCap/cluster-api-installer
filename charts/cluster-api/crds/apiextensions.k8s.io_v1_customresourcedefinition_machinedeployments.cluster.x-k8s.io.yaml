@@ -1830,28 +1830,35 @@ spec:
       jsonPath: .spec.clusterName
       name: Cluster
       type: string
-    - description: Total number of machines desired by this MachineDeployment
+    - description: Cluster pass all availability checks
+      jsonPath: .status.conditions[?(@.type=="Available")].status
+      name: Available
+      type: string
+    - description: The desired number of machines
       jsonPath: .spec.replicas
       name: Desired
-      priority: 10
       type: integer
-    - description: Total number of non-terminated machines targeted by this MachineDeployment
+    - description: The number of machines
       jsonPath: .status.replicas
-      name: Replicas
+      name: Current
       type: integer
-    - description: Total number of ready machines targeted by this MachineDeployment
-      jsonPath: .status.deprecated.v1beta1.readyReplicas
+    - description: The number of machines with Ready condition true
+      jsonPath: .status.readyReplicas
       name: Ready
       type: integer
-    - description: Total number of non-terminated machines targeted by this deployment
-        that have the desired template spec
-      jsonPath: .status.deprecated.v1beta1.updatedReplicas
-      name: Updated
+    - description: The number of machines with Available condition true
+      jsonPath: .status.availableReplicas
+      name: Available
       type: integer
-    - description: Total number of unavailable machines targeted by this MachineDeployment
-      jsonPath: .status.deprecated.v1beta1.unavailableReplicas
-      name: Unavailable
+    - description: The number of machines with UpToDate condition true
+      jsonPath: .status.upToDateReplicas
+      name: Up-to-date
       type: integer
+    - description: Reconciliation paused
+      jsonPath: .status.conditions[?(@.type=="Paused")].status
+      name: Paused
+      priority: 10
+      type: string
     - description: MachineDeployment status such as ScalingUp/ScalingDown/Running/Failed/Unknown
       jsonPath: .status.phase
       name: Phase
@@ -1895,10 +1902,26 @@ spec:
                 maxLength: 63
                 minLength: 1
                 type: string
-              machineNamingStrategy:
+              deletion:
+                description: deletion contains configuration options for MachineDeployment
+                  deletion.
+                minProperties: 1
+                properties:
+                  order:
+                    description: |-
+                      order defines the order in which Machines are deleted when downscaling.
+                      Defaults to "Random".  Valid values are "Random, "Newest", "Oldest"
+                    enum:
+                    - Random
+                    - Newest
+                    - Oldest
+                    type: string
+                type: object
+              machineNaming:
                 description: |-
-                  machineNamingStrategy allows changing the naming pattern used when creating Machines.
+                  machineNaming allows changing the naming pattern used when creating Machines.
                   Note: InfraMachines & BootstrapConfigs will use the same name as the corresponding Machines.
+                minProperties: 1
                 properties:
                   template:
                     description: |-
@@ -1925,6 +1948,31 @@ spec:
               paused:
                 description: paused indicates that the deployment is paused.
                 type: boolean
+              remediation:
+                description: remediation controls how unhealthy Machines are remediated.
+                minProperties: 1
+                properties:
+                  maxInFlight:
+                    anyOf:
+                    - type: integer
+                    - type: string
+                    description: |-
+                      maxInFlight determines how many in flight remediations should happen at the same time.
+
+                      Remediation only happens on the MachineSet with the most current revision, while
+                      older MachineSets (usually present during rollout operations) aren't allowed to remediate.
+
+                      Note: In general (independent of remediations), unhealthy machines are always
+                      prioritized during scale down operations over healthy ones.
+
+                      MaxInFlight can be set to a fixed number or a percentage.
+                      Example: when this is set to 20%, the MachineSet controller deletes at most 20% of
+                      the desired replicas.
+
+                      If not set, remediation is limited to all machines (bounded by replicas)
+                      under the active MachineSet's management.
+                    x-kubernetes-int-or-string: true
+                type: object
               replicas:
                 description: |-
                   replicas is the number of desired machines.
@@ -1946,16 +1994,84 @@ spec:
                     should be later controlled by the autoscaler
                 format: int32
                 type: integer
-              rolloutAfter:
+              rollout:
                 description: |-
-                  rolloutAfter is a field to indicate a rollout should be performed
-                  after the specified time even if no changes have been made to the
-                  MachineDeployment.
-                  Example: In the YAML the time can be specified in the RFC3339 format.
-                  To specify the rolloutAfter target as March 9, 2023, at 9 am UTC
-                  use "2023-03-09T09:00:00Z".
-                format: date-time
-                type: string
+                  rollout allows you to configure the behaviour of rolling updates to the MachineDeployment Machines.
+                  It allows you to require that all Machines are replaced after a certain time,
+                  and allows you to define the strategy used during rolling replacements.
+                minProperties: 1
+                properties:
+                  after:
+                    description: |-
+                      after is a field to indicate a rollout should be performed
+                      after the specified time even if no changes have been made to the
+                      MachineDeployment.
+                      Example: In the YAML the time can be specified in the RFC3339 format.
+                      To specify the rolloutAfter target as March 9, 2023, at 9 am UTC
+                      use "2023-03-09T09:00:00Z".
+                    format: date-time
+                    type: string
+                  strategy:
+                    description: strategy specifies how to roll out control plane
+                      Machines.
+                    minProperties: 1
+                    properties:
+                      rollingUpdate:
+                        description: |-
+                          rollingUpdate is the rolling update config params. Present only if
+                          type = RollingUpdate.
+                        minProperties: 1
+                        properties:
+                          maxSurge:
+                            anyOf:
+                            - type: integer
+                            - type: string
+                            description: |-
+                              maxSurge is the maximum number of machines that can be scheduled above the
+                              desired number of machines.
+                              Value can be an absolute number (ex: 5) or a percentage of
+                              desired machines (ex: 10%).
+                              This can not be 0 if MaxUnavailable is 0.
+                              Absolute number is calculated from percentage by rounding up.
+                              Defaults to 1.
+                              Example: when this is set to 30%, the new MachineSet can be scaled
+                              up immediately when the rolling update starts, such that the total
+                              number of old and new machines do not exceed 130% of desired
+                              machines. Once old machines have been killed, new MachineSet can
+                              be scaled up further, ensuring that total number of machines running
+                              at any time during the update is at most 130% of desired machines.
+                            x-kubernetes-int-or-string: true
+                          maxUnavailable:
+                            anyOf:
+                            - type: integer
+                            - type: string
+                            description: |-
+                              maxUnavailable is the maximum number of machines that can be unavailable during the update.
+                              Value can be an absolute number (ex: 5) or a percentage of desired
+                              machines (ex: 10%).
+                              Absolute number is calculated from percentage by rounding down.
+                              This can not be 0 if MaxSurge is 0.
+                              Defaults to 0.
+                              Example: when this is set to 30%, the old MachineSet can be scaled
+                              down to 70% of desired machines immediately when the rolling update
+                              starts. Once new machines are ready, old MachineSet can be scaled
+                              down further, followed by scaling up the new MachineSet, ensuring
+                              that the total number of machines available at all times
+                              during the update is at least 70% of desired machines.
+                            x-kubernetes-int-or-string: true
+                        type: object
+                      type:
+                        description: |-
+                          type of rollout. Allowed values are RollingUpdate and OnDelete.
+                          Default is RollingUpdate.
+                        enum:
+                        - RollingUpdate
+                        - OnDelete
+                        type: string
+                    required:
+                    - type
+                    type: object
+                type: object
               selector:
                 description: |-
                   selector is the label selector for machines. Existing MachineSets whose machines are
@@ -2005,99 +2121,6 @@ spec:
                     type: object
                 type: object
                 x-kubernetes-map-type: atomic
-              strategy:
-                description: |-
-                  strategy is the deployment strategy to use to replace existing machines with
-                  new ones.
-                properties:
-                  remediation:
-                    description: |-
-                      remediation controls the strategy of remediating unhealthy machines
-                      and how remediating operations should occur during the lifecycle of the dependant MachineSets.
-                    properties:
-                      maxInFlight:
-                        anyOf:
-                        - type: integer
-                        - type: string
-                        description: |-
-                          maxInFlight determines how many in flight remediations should happen at the same time.
-
-                          Remediation only happens on the MachineSet with the most current revision, while
-                          older MachineSets (usually present during rollout operations) aren't allowed to remediate.
-
-                          Note: In general (independent of remediations), unhealthy machines are always
-                          prioritized during scale down operations over healthy ones.
-
-                          MaxInFlight can be set to a fixed number or a percentage.
-                          Example: when this is set to 20%, the MachineSet controller deletes at most 20% of
-                          the desired replicas.
-
-                          If not set, remediation is limited to all machines (bounded by replicas)
-                          under the active MachineSet's management.
-                        x-kubernetes-int-or-string: true
-                    type: object
-                  rollingUpdate:
-                    description: |-
-                      rollingUpdate is the rolling update config params. Present only if
-                      MachineDeploymentStrategyType = RollingUpdate.
-                    properties:
-                      deletePolicy:
-                        description: |-
-                          deletePolicy defines the policy used by the MachineDeployment to identify nodes to delete when downscaling.
-                          Valid values are "Random, "Newest", "Oldest"
-                          When no value is supplied, the default DeletePolicy of MachineSet is used
-                        enum:
-                        - Random
-                        - Newest
-                        - Oldest
-                        type: string
-                      maxSurge:
-                        anyOf:
-                        - type: integer
-                        - type: string
-                        description: |-
-                          maxSurge is the maximum number of machines that can be scheduled above the
-                          desired number of machines.
-                          Value can be an absolute number (ex: 5) or a percentage of
-                          desired machines (ex: 10%).
-                          This can not be 0 if MaxUnavailable is 0.
-                          Absolute number is calculated from percentage by rounding up.
-                          Defaults to 1.
-                          Example: when this is set to 30%, the new MachineSet can be scaled
-                          up immediately when the rolling update starts, such that the total
-                          number of old and new machines do not exceed 130% of desired
-                          machines. Once old machines have been killed, new MachineSet can
-                          be scaled up further, ensuring that total number of machines running
-                          at any time during the update is at most 130% of desired machines.
-                        x-kubernetes-int-or-string: true
-                      maxUnavailable:
-                        anyOf:
-                        - type: integer
-                        - type: string
-                        description: |-
-                          maxUnavailable is the maximum number of machines that can be unavailable during the update.
-                          Value can be an absolute number (ex: 5) or a percentage of desired
-                          machines (ex: 10%).
-                          Absolute number is calculated from percentage by rounding down.
-                          This can not be 0 if MaxSurge is 0.
-                          Defaults to 0.
-                          Example: when this is set to 30%, the old MachineSet can be scaled
-                          down to 70% of desired machines immediately when the rolling update
-                          starts. Once new machines are ready, old MachineSet can be scaled
-                          down further, followed by scaling up the new MachineSet, ensuring
-                          that the total number of machines available at all times
-                          during the update is at least 70% of desired machines.
-                        x-kubernetes-int-or-string: true
-                    type: object
-                  type:
-                    description: |-
-                      type of deployment. Allowed values are RollingUpdate and OnDelete.
-                      The default is RollingUpdate.
-                    enum:
-                    - RollingUpdate
-                    - OnDelete
-                    type: string
-                type: object
               template:
                 description: template describes the machines that will be created.
                 properties:
@@ -2105,6 +2128,7 @@ spec:
                     description: |-
                       metadata is the standard object's metadata.
                       More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+                    minProperties: 1
                     properties:
                       annotations:
                         additionalProperties:
@@ -2187,6 +2211,35 @@ spec:
                         maxLength: 63
                         minLength: 1
                         type: string
+                      deletion:
+                        description: deletion contains configuration options for Machine
+                          deletion.
+                        minProperties: 1
+                        properties:
+                          nodeDeletionTimeoutSeconds:
+                            description: |-
+                              nodeDeletionTimeoutSeconds defines how long the controller will attempt to delete the Node that the Machine
+                              hosts after the Machine is marked for deletion. A duration of 0 will retry deletion indefinitely.
+                              Defaults to 10 seconds.
+                            format: int32
+                            minimum: 0
+                            type: integer
+                          nodeDrainTimeoutSeconds:
+                            description: |-
+                              nodeDrainTimeoutSeconds is the total amount of time that the controller will spend on draining a node.
+                              The default value is 0, meaning that the node can be drained without any time limitations.
+                              NOTE: nodeDrainTimeoutSeconds is different from `kubectl drain --timeout`
+                            format: int32
+                            minimum: 0
+                            type: integer
+                          nodeVolumeDetachTimeoutSeconds:
+                            description: |-
+                              nodeVolumeDetachTimeoutSeconds is the total amount of time that the controller will spend on waiting for all volumes
+                              to be detached. The default value is 0, meaning that the volumes can be detached without any time limitations.
+                            format: int32
+                            minimum: 0
+                            type: integer
+                        type: object
                       failureDomain:
                         description: |-
                           failureDomain is the failure domain the machine will be created in.
@@ -2235,28 +2288,6 @@ spec:
                           minReadySeconds is the minimum number of seconds for which a Machine should be ready before considering it available.
                           Defaults to 0 (Machine will be considered available as soon as the Machine is ready)
                         format: int32
-                        type: integer
-                      nodeDeletionTimeoutSeconds:
-                        description: |-
-                          nodeDeletionTimeoutSeconds defines how long the controller will attempt to delete the Node that the Machine
-                          hosts after the Machine is marked for deletion. A duration of 0 will retry deletion indefinitely.
-                          Defaults to 10 seconds.
-                        format: int32
-                        minimum: 0
-                        type: integer
-                      nodeDrainTimeoutSeconds:
-                        description: |-
-                          nodeDrainTimeoutSeconds is the total amount of time that the controller will spend on draining a node.
-                          The default value is 0, meaning that the node can be drained without any time limitations.
-                          NOTE: nodeDrainTimeoutSeconds is different from `kubectl drain --timeout`
-                        format: int32
-                        minimum: 0
-                        type: integer
-                      nodeVolumeDetachTimeoutSeconds:
-                        description: |-
-                          nodeVolumeDetachTimeoutSeconds is the total amount of time that the controller will spend on waiting for all volumes
-                          to be detached. The default value is 0, meaning that the volumes can be detached without any time limitations.
-                        format: int32
                         minimum: 0
                         type: integer
                       providerID:
@@ -2285,7 +2316,6 @@ spec:
                           Another example are external controllers, e.g. responsible to install special software/hardware on the Machines;
                           they can include the status of those components with a new condition and add this condition to ReadinessGates.
 
-                          NOTE: This field is considered only for computing v1beta2 conditions.
                           NOTE: In case readinessGates conditions start with the APIServer, ControllerManager, Scheduler prefix, and all those
                           readiness gates condition are reporting the same message, when computing the Machine's Ready condition those
                           readinessGates will be replaced by a single entry reporting "Control plane components: " + message.
@@ -2318,6 +2348,7 @@ spec:
                           - conditionType
                           type: object
                         maxItems: 32
+                        minItems: 1
                         type: array
                         x-kubernetes-list-map-keys:
                         - conditionType
@@ -2344,6 +2375,7 @@ spec:
             type: object
           status:
             description: status is the observed state of MachineDeployment.
+            minProperties: 1
             properties:
               availableReplicas:
                 description: availableReplicas is the number of available replicas
@@ -2557,6 +2589,8 @@ spec:
                 format: int32
                 type: integer
             type: object
+        required:
+        - spec
         type: object
     served: true
     storage: true
