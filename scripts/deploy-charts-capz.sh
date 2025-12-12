@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ -n "$USE_KIND" ] ; then
+if [ "$USE_KIND" = true ] ; then
     CHART_SUFFIX="-k8s"
     KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-aso2}
     KUBE_CONTEXT="--context=kind-$KIND_CLUSTER_NAME"
