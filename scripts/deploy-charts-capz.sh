@@ -53,6 +53,9 @@ for T in capi capz; do
     kubectl $KUBE_CONTEXT events -n ${T}-system --watch &
     CH_PID=$!
     kubectl $KUBE_CONTEXT -n ${T}-system wait deployment/${T}-controller-manager --for condition=Available=True  --timeout=10m
+    if [ "${T}" = capz ] ; then
+        kubectl $KUBE_CONTEXT -n ${T}-system wait deployment/azureserviceoperator-controller-manager --for condition=Available=True  --timeout=10m
+    fi
     kill $CH_PID
     echo
 done

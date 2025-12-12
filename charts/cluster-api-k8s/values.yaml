@@ -1,7 +1,7 @@
 manager:
   cmd: /manager
   image:
-    tag: v4.20
+    tag: v1.11.0-alpha.2
     url: gcr.io/k8s-staging-cluster-api/cluster-api-controller
 webhook:
   image:

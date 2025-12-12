@@ -16,7 +16,6 @@ if [ "$KIND_CLUSTER_NAME" == "capz-mveber-int" ] ; then
     export USER_ASSIGNED_IDENTITY_ARO=mveber-aro-tests
     export ENV=int
 fi
-export KUBE_CONTEXT="--context=kind-$KIND_CLUSTER_NAME"
 export NAMESPACE=${NAMESPACE:-default}
 
 

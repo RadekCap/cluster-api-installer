@@ -5,6 +5,8 @@ SYNC2CHARTS ?= true
 DEFAULT_BRANCH ?= release-4.20
 CAPA_BRANCH ?= backplane-2.10
 CAPZ_BRANCH ?= backplane-2.11
+CAPI_BRANCH=v1.11.0-alpha.2
+CAPI_REPO ?= https://github.com/kubernetes-sigs
 DEFAULT_ORGREPO ?= https://github.com/openshift
 STOLOSTRON_ORGREPO ?= https://github.com/stolostron
 # needs overridable branch, as the non-master branch will differ
@@ -29,15 +31,15 @@ WKDIR ?= ../out
 build-cluster-api-chart:
 	@echo "Building cluster-api chart"
 	WKDIR="$(WKDIR)" \
-	ORGREPO="$(DEFAULT_ORGREPO)" \
+	ORGREPO="$(CAPI_REPO)" \
 	PROJECT="cluster-api" \
-	BRANCH="$(DEFAULT_BRANCH)" \
+	BRANCH="$(CAPI_BRANCH)" \
 	../scripts/build.sh
 	BUILTDIR="$(WKDIR)/cluster-api/config/tmp" \
 	CHART_VERSION="$(OCP_VERSION)" \
 	CHART_APP_VERSION="$(OCP_VERSION)" \
-	CHART_VALUES_IMAGE_TAG="$(OCP_VERSION)" \
-	CHART_VALUES_IMAGE_TAG_PREFIX="v" \
+	CHART_VALUES_IMAGE_TAG="$(CAPI_BRANCH)" \
+	CHART_VALUES_IMAGE_TAG_PREFIX="" \
 	SYNC2CHARTS="$(SYNC2CHARTS)" \
 	PROJECT="cluster-api" \
 	../scripts/sync2chart.sh

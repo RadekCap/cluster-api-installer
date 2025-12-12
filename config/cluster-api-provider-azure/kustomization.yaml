@@ -63,7 +63,9 @@ patches:
   #   patch: |-
   #     - op: remove
   #       path: /spec/conversion 
-  # Remove cert-manager annotation and add OCP cert service annotation
+  # Remove cert-manager annotation from CRDs
+  # NOTE: service.beta.openshift.io/inject-cabundle does NOT work for CRD conversion webhooks
+  # The CA bundle must be injected post-deployment using a script or admission controller
   - target:
       version: v1
       kind: CustomResourceDefinition
@@ -71,9 +73,6 @@ patches:
     patch: |-
       - op: remove
         path: /metadata/annotations/cert-manager.io~1inject-ca-from
-      - op: add
-        path: /metadata/annotations/service.beta.openshift.io~1inject-cabundle
-        value: true
   - target:
       version: v1
       kind: MutatingWebhookConfiguration

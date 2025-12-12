@@ -36,6 +36,9 @@ CONTAINER_ENGINE ?= docker
 build-cluster-api-provider-azure-chart: $(YQ) $(KUSTOMIZE) $(CLUSTERCTL) $(HELM)
 	(export YQ=$(YQ) CLUSTERCTL=$(CLUSTERCTL) KUSTOMIZE=$(KUSTOMIZE) HELM=$(HELM); $(MAKE) -C ./charts build-cluster-api-provider-azure-chart)
 
+build-cluster-api-chart: $(YQ) $(KUSTOMIZE) $(CLUSTERCTL) $(HELM)
+	(export YQ=$(YQ) CLUSTERCTL=$(CLUSTERCTL) KUSTOMIZE=$(KUSTOMIZE) HELM=$(HELM); $(MAKE) -C ./charts build-cluster-api-chart)
+
 build-helm-charts: $(YQ) $(KUSTOMIZE) $(CLUSTERCTL) $(HELM)
 	(export YQ=$(YQ) CLUSTERCTL=$(CLUSTERCTL) KUSTOMIZE=$(KUSTOMIZE) HELM=$(HELM); $(MAKE) -C ./charts build)
 
