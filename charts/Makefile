@@ -4,9 +4,7 @@ SYNC2CHARTS ?= true
 
 DEFAULT_BRANCH ?= release-4.21
 CAPA_BRANCH ?= backplane-2.10
-CAPZ_BRANCH ?= backplane-2.11-fix-tests2
-CAPI_BRANCH=v1.11.0-alpha.2
-CAPI_REPO ?= https://github.com/kubernetes-sigs
+CAPZ_BRANCH ?= backplane-2.11
 DEFAULT_ORGREPO ?= https://github.com/openshift
 STOLOSTRON_ORGREPO ?= https://github.com/stolostron
 # needs overridable branch, as the non-master branch will differ
@@ -65,7 +63,7 @@ build-cluster-api-provider-aws-chart:
 build-cluster-api-provider-azure-chart:
 	@echo "Building cluster-api-provider-azure chart"
 	WKDIR="$(WKDIR)" \
-	ORGREPO="https://github.com/marek-veber" \
+	ORGREPO="$(STOLOSTRON_ORGREPO)" \
 	PROJECT="cluster-api-provider-azure" \
 	BRANCH="$(CAPZ_BRANCH)" \
 	../scripts/build.sh
