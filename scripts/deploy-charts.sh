@@ -2,7 +2,7 @@
 set -e
 
 if [ "$USE_KIND" = true ] ; then
-    CHART_SUFFIX="-k8s"
+    CHART_SUFFIX="-kind"
     KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-aso2}
     KUBE_CONTEXT="--context=kind-$KIND_CLUSTER_NAME"
     
@@ -21,12 +21,7 @@ function set_namespace_and_t {
     case "$PROJECT" in
       cluster-api)
         T="capi"
-        if [ -z "$CHART_SUFFIX" ] ; then
-           NAMESPACE="capi-system"
-        else
-           kubectl $KUBE_CONTEXT create namespace multicluster-engine || true
-           NAMESPACE="multicluster-engine"
-        fi
+        NAMESPACE="capi-system"
         ;;
       cluster-api-provider-azure)
         T="capz"
