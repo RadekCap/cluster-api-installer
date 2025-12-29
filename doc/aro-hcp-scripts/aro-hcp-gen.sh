@@ -16,7 +16,6 @@ if [ "$KIND_CLUSTER_NAME" == "capz-mveber-int" ] ; then
     export USER_ASSIGNED_IDENTITY_ARO=mveber-aro-tests
     export ENV=int
 fi
-export KUBE_CONTEXT="--context=kind-$KIND_CLUSTER_NAME"
 export NAMESPACE=${NAMESPACE:-default}
 
 
@@ -107,7 +106,7 @@ export EA_OIDC_PROVIDER_NAME=${CS_CLUSTER_NAME}-ea
 export EA_AZURE_TENANT_ID=${AZURE_TENANT_ID}
 export EA_AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
 export EA_DISABLE='#'
-[ "$USE_EA" == true ] || EA_DISABLE=''
+[ "$USE_EA" = true ] && EA_DISABLE=''
 
 echo ENV=$ENV - AZURE_SUBSCRIPTION_NAME=${AZURE_SUBSCRIPTION_NAME} AZURE_SUBSCRIPTION_ID=${AZURE_SUBSCRIPTION_ID}
 echo AZURE_TENANT_ID=${AZURE_TENANT_ID}

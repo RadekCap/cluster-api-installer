@@ -9,13 +9,21 @@ if [ ! -f "$ARO_YAML_FILE" ] ; then
    exit 1
 fi
 
+if [ "$USE_KIND" = true ] ; then
+    KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-aso2}
+    KUBE_CONTEXT="--context=kind-$KIND_CLUSTER_NAME"
+else
+    OCP_CONTEXT=${OCP_CONTEXT:-crc-admin}
+    KUBE_CONTEXT="--context=$OCP_CONTEXT"
+fi
+
 export CLUSTER_NAME=$(yq 'select(.kind == "AROControlPlane").spec.aroClusterName'     < "$ARO_YAML_FILE" )
 export CLUSTER_NAMESPACE=$(yq 'select(.kind == "AROControlPlane").metadata.namespace' < "$ARO_YAML_FILE" )
 export EA_AZURE_TENANT_ID=$(yq 'select(.kind == "AROControlPlane").spec.externalAuthProviders[0].issuer.issuerURL' < "$ARO_YAML_FILE"|sed -e 's;/v2.\0$;;' -e 's;.*/;;')
 export EA_AZURE_CLIENT_ID=$(yq 'select(.kind == "AROControlPlane").spec.externalAuthProviders[0].issuer.audiences[0]' < "$ARO_YAML_FILE")
 export GROUP_NAME="aro-hcp-engineering-App Developer"
 
-export CONSOLE_URL=$(oc get -n "$CLUSTER_NAMESPACE" arocp "$CLUSTER_NAME-control-plane" -o json|jq -r '.status.consoleURL')
+export CONSOLE_URL=$(oc $KUBE_CONTEXT get -n "$CLUSTER_NAMESPACE" arocp "$CLUSTER_NAME-control-plane" -o json|jq -r '.status.consoleURL')
 
 export CLUSTER_DOMAIN=${CONSOLE_URL##"https://console-openshift-console.apps."}
 
@@ -33,7 +41,7 @@ if [ -z "$CLUSTER_NAMESPACE" ] ; then
    echo no CLUSTER_NAMESPACE
    exit 1
 fi
-if [ -z "$CONSOLE_URL" ] ; then
+if [ -z "$CONSOLE_URL" -o "$CONSOLE_URL" = "null" ] ; then
    echo no CONSOLE_URL
    exit 1
 fi
@@ -79,13 +87,13 @@ fi
 
 # Create the external auth console secret on the management cluster
 # This secret is required for external auth synchronization
-[ -n "$DELETE_SECRETS" ] && oc delete secret -n "$CLUSTER_NAMESPACE" "${CLUSTER_NAME}-ea-console-openshift-console"
-oc create secret generic "${CLUSTER_NAME}-ea-console-openshift-console" \
+[ -n "$DELETE_SECRETS" ] && oc $KUBE_CONTEXT delete secret -n "$CLUSTER_NAMESPACE" "${CLUSTER_NAME}-ea-console-openshift-console"
+oc $KUBE_CONTEXT create secret generic "${CLUSTER_NAME}-ea-console-openshift-console" \
     -n "$CLUSTER_NAMESPACE" \
     --from-literal=clientSecret="$AZURE_CLIENT_SECRET"
 
 export KC="${CLUSTER_NAME}.kubeconfig"
-oc get secret "${CLUSTER_NAME}-kubeconfig" -n "$CLUSTER_NAMESPACE" -o jsonpath='{.data.value}' | base64 -d > "$KC"
+oc $KUBE_CONTEXT get secret "${CLUSTER_NAME}-kubeconfig" -n "$CLUSTER_NAMESPACE" -o jsonpath='{.data.value}' | base64 -d > "$KC"
 
 # WORKAROUND: Azure ARO HCP should create this secret automatically, but it doesn't
 # Commenting out for now - if console fails to start, uncomment this section
