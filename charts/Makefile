@@ -63,12 +63,12 @@ build-cluster-api-provider-azure-chart:
 	WKDIR="$(WKDIR)" \
 	ORGREPO="https://github.com/marek-veber" \
 	PROJECT="cluster-api-provider-azure" \
-	BRANCH="ARO-aso-v2.13.0-upstream" \
+	BRANCH="backplane-2.11-rebase" \
 	../scripts/build.sh
 	BUILTDIR="$(WKDIR)/cluster-api-provider-azure/config/tmp" \
 	CHART_VERSION="$(OCP_VERSION)" \
 	CHART_APP_VERSION="$(OCP_VERSION)" \
-	CHART_VALUES_IMAGE_TAG="dev-aso.3.7" \
+	CHART_VALUES_IMAGE_TAG="dev-aso.3.8" \
 	CHART_VALUES_IMAGE_TAG_PREFIX="" \
 	SYNC2CHARTS="$(SYNC2CHARTS)" \
 	PROJECT="cluster-api-provider-azure" \
