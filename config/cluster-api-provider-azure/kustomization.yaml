@@ -4,7 +4,6 @@ kind: Kustomization
 ## condsidering resources under cluster-api-provider-azure/config/default directory to generate the CAPZ CRDs and CRs
 resources:
 - default/
-- base/aso-crds/
 
 transformers:
 - base/transformer.yaml

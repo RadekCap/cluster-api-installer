@@ -2,11 +2,11 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.3
+    controller-gen.kubebuilder.io/version: v0.19.0
     service.beta.openshift.io/inject-cabundle: "true"
   labels:
     app.kubernetes.io/name: azure-service-operator
-    app.kubernetes.io/version: v2.13.0-hcpclusters.1
+    app.kubernetes.io/version: v2.13.0-hcpclusters.2
   name: hcpopenshiftclustersexternalauths.redhatopenshift.azure.com
 spec:
   conversion:
@@ -42,12 +42,12 @@ spec:
     - jsonPath: .status.conditions[?(@.type=='Ready')].message
       name: Message
       type: string
-    name: v1api20240610preview
+    name: v1api20251223preview
     schema:
       openAPIV3Schema:
         description: |-
           Generator information:
-          - Generated from: /redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/hcpclusters/preview/2024-06-10-preview/openapi.json
+          - Generated from: /redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/hcpclusters/preview/2025-12-23-preview/openapi.json
           - ARM URI: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RedHatOpenShift/hcpOpenShiftClusters/{hcpOpenShiftClusterName}/externalAuths/{externalAuthName}
         properties:
           apiVersion:
@@ -202,7 +202,8 @@ spec:
                                 description: |-
                                   PrefixPolicy: Prefix policy is an optional field that configures how a prefix should be
                                   applied to the value of the JWT claim specified in the 'claim' field.
-                                  Allowed values are 'Prefix', 'NoPrefix', and 'None'.
+                                  Allowed values are 'Prefix', 'NoPrefix', and 'None'. If not specified, the
+                                  default policy is 'None'.
                                   When set to 'Prefix', the value specified in the prefix field will be
                                   prepended to the value of the JWT claim.
                                   The prefix field must be set when prefixPolicy is 'Prefix'.
@@ -466,7 +467,8 @@ spec:
                                 description: |-
                                   PrefixPolicy: Prefix policy is an optional field that configures how a prefix should be
                                   applied to the value of the JWT claim specified in the 'claim' field.
-                                  Allowed values are 'Prefix', 'NoPrefix', and 'None'.
+                                  Allowed values are 'Prefix', 'NoPrefix', and 'None'. If not specified, the
+                                  default policy is 'None'.
                                   When set to 'Prefix', the value specified in the prefix field will be
                                   prepended to the value of the JWT claim.
                                   The prefix field must be set when prefixPolicy is 'Prefix'.
@@ -681,13 +683,13 @@ spec:
     - jsonPath: .status.conditions[?(@.type=='Ready')].message
       name: Message
       type: string
-    name: v1api20240610previewstorage
+    name: v1api20251223previewstorage
     schema:
       openAPIV3Schema:
         description: |-
-          Storage version of v1api20240610preview.HcpOpenShiftClustersExternalAuth
+          Storage version of v1api20251223preview.HcpOpenShiftClustersExternalAuth
           Generator information:
-          - Generated from: /redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/hcpclusters/preview/2024-06-10-preview/openapi.json
+          - Generated from: /redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/hcpclusters/preview/2025-12-23-preview/openapi.json
           - ARM URI: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RedHatOpenShift/hcpOpenShiftClusters/{hcpOpenShiftClusterName}/externalAuths/{externalAuthName}
         properties:
           apiVersion:
@@ -708,7 +710,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: Storage version of v1api20240610preview.HcpOpenShiftClustersExternalAuth_Spec
+            description: Storage version of v1api20251223preview.HcpOpenShiftClustersExternalAuth_Spec
             properties:
               $propertyBag:
                 additionalProperties:
@@ -724,7 +726,7 @@ spec:
                 type: string
               operatorSpec:
                 description: |-
-                  Storage version of v1api20240610preview.HcpOpenShiftClustersExternalAuthOperatorSpec
+                  Storage version of v1api20251223preview.HcpOpenShiftClustersExternalAuthOperatorSpec
                   Details for configuring operator behavior. Fields in this struct are interpreted by the operator directly rather than being passed to Azure
                 properties:
                   $propertyBag:
@@ -810,7 +812,7 @@ spec:
                 type: object
               properties:
                 description: |-
-                  Storage version of v1api20240610preview.ExternalAuthProperties
+                  Storage version of v1api20251223preview.ExternalAuthProperties
                   External Auth profile
                 properties:
                   $propertyBag:
@@ -822,7 +824,7 @@ spec:
                     type: object
                   claim:
                     description: |-
-                      Storage version of v1api20240610preview.ExternalAuthClaimProfile
+                      Storage version of v1api20251223preview.ExternalAuthClaimProfile
                       External Auth claim profile
                     properties:
                       $propertyBag:
@@ -834,7 +836,7 @@ spec:
                         type: object
                       mappings:
                         description: |-
-                          Storage version of v1api20240610preview.TokenClaimMappingsProfile
+                          Storage version of v1api20251223preview.TokenClaimMappingsProfile
                           External Auth claim mappings profile.
                           At a minimum username or groups must be defined.
                         properties:
@@ -847,7 +849,7 @@ spec:
                             type: object
                           groups:
                             description: |-
-                              Storage version of v1api20240610preview.GroupClaimProfile
+                              Storage version of v1api20251223preview.GroupClaimProfile
                               External Auth claim profile
                               This configures how the groups of a cluster identity should be constructed
                               from the claims
@@ -872,7 +874,7 @@ spec:
                             type: object
                           username:
                             description: |-
-                              Storage version of v1api20240610preview.UsernameClaimProfile
+                              Storage version of v1api20251223preview.UsernameClaimProfile
                               External Auth claim profile
                               This configures how the username of a cluster identity should be constructed
                               from the claims
@@ -896,7 +898,7 @@ spec:
                       validationRules:
                         items:
                           description: |-
-                            Storage version of v1api20240610preview.TokenClaimValidationRule
+                            Storage version of v1api20251223preview.TokenClaimValidationRule
                             External Auth claim validation rule
                           properties:
                             $propertyBag:
@@ -908,7 +910,7 @@ spec:
                               type: object
                             requiredClaim:
                               description: |-
-                                Storage version of v1api20240610preview.TokenRequiredClaim
+                                Storage version of v1api20251223preview.TokenRequiredClaim
                                 Token required claim validation rule.
                               properties:
                                 $propertyBag:
@@ -931,7 +933,7 @@ spec:
                   clients:
                     items:
                       description: |-
-                        Storage version of v1api20240610preview.ExternalAuthClientProfile
+                        Storage version of v1api20251223preview.ExternalAuthClientProfile
                         External Auth client profile
                         This configures how on-cluster, platform clients should request tokens from the identity
                         provider.
@@ -947,7 +949,7 @@ spec:
                           type: string
                         component:
                           description: |-
-                            Storage version of v1api20240610preview.ExternalAuthClientComponentProfile
+                            Storage version of v1api20251223preview.ExternalAuthClientComponentProfile
                             External Auth component profile
                             Must have unique namespace/name pairs.
                           properties:
@@ -973,7 +975,7 @@ spec:
                     type: array
                   issuer:
                     description: |-
-                      Storage version of v1api20240610preview.TokenIssuerProfile
+                      Storage version of v1api20251223preview.TokenIssuerProfile
                       Token issuer profile
                       This configures how the platform interacts with the identity provider and
                       how tokens issued from
@@ -1000,7 +1002,7 @@ spec:
             - owner
             type: object
           status:
-            description: Storage version of v1api20240610preview.HcpOpenShiftClustersExternalAuth_STATUS
+            description: Storage version of v1api20251223preview.HcpOpenShiftClustersExternalAuth_STATUS
             properties:
               $propertyBag:
                 additionalProperties:
@@ -1062,7 +1064,7 @@ spec:
                 type: string
               properties:
                 description: |-
-                  Storage version of v1api20240610preview.ExternalAuthProperties_STATUS
+                  Storage version of v1api20251223preview.ExternalAuthProperties_STATUS
                   External Auth profile
                 properties:
                   $propertyBag:
@@ -1074,7 +1076,7 @@ spec:
                     type: object
                   claim:
                     description: |-
-                      Storage version of v1api20240610preview.ExternalAuthClaimProfile_STATUS
+                      Storage version of v1api20251223preview.ExternalAuthClaimProfile_STATUS
                       External Auth claim profile
                     properties:
                       $propertyBag:
@@ -1086,7 +1088,7 @@ spec:
                         type: object
                       mappings:
                         description: |-
-                          Storage version of v1api20240610preview.TokenClaimMappingsProfile_STATUS
+                          Storage version of v1api20251223preview.TokenClaimMappingsProfile_STATUS
                           External Auth claim mappings profile.
                           At a minimum username or groups must be defined.
                         properties:
@@ -1099,7 +1101,7 @@ spec:
                             type: object
                           groups:
                             description: |-
-                              Storage version of v1api20240610preview.GroupClaimProfile_STATUS
+                              Storage version of v1api20251223preview.GroupClaimProfile_STATUS
                               External Auth claim profile
                               This configures how the groups of a cluster identity should be constructed
                               from the claims
@@ -1124,7 +1126,7 @@ spec:
                             type: object
                           username:
                             description: |-
-                              Storage version of v1api20240610preview.UsernameClaimProfile_STATUS
+                              Storage version of v1api20251223preview.UsernameClaimProfile_STATUS
                               External Auth claim profile
                               This configures how the username of a cluster identity should be constructed
                               from the claims
@@ -1148,7 +1150,7 @@ spec:
                       validationRules:
                         items:
                           description: |-
-                            Storage version of v1api20240610preview.TokenClaimValidationRule_STATUS
+                            Storage version of v1api20251223preview.TokenClaimValidationRule_STATUS
                             External Auth claim validation rule
                           properties:
                             $propertyBag:
@@ -1160,7 +1162,7 @@ spec:
                               type: object
                             requiredClaim:
                               description: |-
-                                Storage version of v1api20240610preview.TokenRequiredClaim_STATUS
+                                Storage version of v1api20251223preview.TokenRequiredClaim_STATUS
                                 Token required claim validation rule.
                               properties:
                                 $propertyBag:
@@ -1183,7 +1185,7 @@ spec:
                   clients:
                     items:
                       description: |-
-                        Storage version of v1api20240610preview.ExternalAuthClientProfile_STATUS
+                        Storage version of v1api20251223preview.ExternalAuthClientProfile_STATUS
                         External Auth client profile
                         This configures how on-cluster, platform clients should request tokens from the identity
                         provider.
@@ -1199,7 +1201,7 @@ spec:
                           type: string
                         component:
                           description: |-
-                            Storage version of v1api20240610preview.ExternalAuthClientComponentProfile_STATUS
+                            Storage version of v1api20251223preview.ExternalAuthClientComponentProfile_STATUS
                             External Auth component profile
                             Must have unique namespace/name pairs.
                           properties:
@@ -1225,7 +1227,7 @@ spec:
                     type: array
                   condition:
                     description: |-
-                      Storage version of v1api20240610preview.ExternalAuthCondition_STATUS
+                      Storage version of v1api20251223preview.ExternalAuthCondition_STATUS
                       Condition defines an observation of the external auth state.
                     properties:
                       $propertyBag:
@@ -1248,7 +1250,7 @@ spec:
                     type: object
                   issuer:
                     description: |-
-                      Storage version of v1api20240610preview.TokenIssuerProfile_STATUS
+                      Storage version of v1api20251223preview.TokenIssuerProfile_STATUS
                       Token issuer profile
                       This configures how the platform interacts with the identity provider and
                       how tokens issued from
@@ -1275,7 +1277,7 @@ spec:
                 type: object
               systemData:
                 description: |-
-                  Storage version of v1api20240610preview.SystemData_STATUS
+                  Storage version of v1api20251223preview.SystemData_STATUS
                   Metadata pertaining to creation and last modification of the resource.
                 properties:
                   $propertyBag:

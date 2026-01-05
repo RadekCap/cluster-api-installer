@@ -6836,15 +6836,15 @@ webhooks:
     service:
       name: azureserviceoperator-webhook-service
       namespace: capz-system
-      path: /validate-redhatopenshift-azure-com-v1api20240610preview-hcpopenshiftcluster
+      path: /validate-redhatopenshift-azure-com-v1api20251223preview-hcpopenshiftcluster
   failurePolicy: Fail
   matchPolicy: Exact
-  name: validate.v1api20240610preview.hcpopenshiftclusters.redhatopenshift.azure.com
+  name: validate.v1api20251223preview.hcpopenshiftclusters.redhatopenshift.azure.com
   rules:
   - apiGroups:
     - redhatopenshift.azure.com
     apiVersions:
-    - v1api20240610preview
+    - v1api20251223preview
     operations:
     - CREATE
     - UPDATE
@@ -6857,15 +6857,15 @@ webhooks:
     service:
       name: azureserviceoperator-webhook-service
       namespace: capz-system
-      path: /validate-redhatopenshift-azure-com-v1api20240610preview-hcpopenshiftclustersexternalauth
+      path: /validate-redhatopenshift-azure-com-v1api20251223preview-hcpopenshiftclustersexternalauth
   failurePolicy: Fail
   matchPolicy: Exact
-  name: validate.v1api20240610preview.hcpopenshiftclustersexternalauths.redhatopenshift.azure.com
+  name: validate.v1api20251223preview.hcpopenshiftclustersexternalauths.redhatopenshift.azure.com
   rules:
   - apiGroups:
     - redhatopenshift.azure.com
     apiVersions:
-    - v1api20240610preview
+    - v1api20251223preview
     operations:
     - CREATE
     - UPDATE
@@ -6878,15 +6878,15 @@ webhooks:
     service:
       name: azureserviceoperator-webhook-service
       namespace: capz-system
-      path: /validate-redhatopenshift-azure-com-v1api20240610preview-hcpopenshiftclustersnodepool
+      path: /validate-redhatopenshift-azure-com-v1api20251223preview-hcpopenshiftclustersnodepool
   failurePolicy: Fail
   matchPolicy: Exact
-  name: validate.v1api20240610preview.hcpopenshiftclustersnodepools.redhatopenshift.azure.com
+  name: validate.v1api20251223preview.hcpopenshiftclustersnodepools.redhatopenshift.azure.com
   rules:
   - apiGroups:
     - redhatopenshift.azure.com
     apiVersions:
-    - v1api20240610preview
+    - v1api20251223preview
     operations:
     - CREATE
     - UPDATE
