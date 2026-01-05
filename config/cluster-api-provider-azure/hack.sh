@@ -18,7 +18,8 @@ echo creating: "$ASO_DST_DIR/aso-crds.yaml"
 set -x
 curl -fSsL "https://github.com/${ASO_WORKSPACE}/azure-service-operator/releases/download/${ASO_VERSION}/azureserviceoperator_customresourcedefinitions_${ASO_VERSION}.yaml" | \
 	$YQ e ". | select(${ASO_CRDS_CHECK})" - | \
-	sed 's/\$\$/$$$$/g' \
+	sed 's/\$\$/$$$$/g' | \
+	sed 's/namespace: azureserviceoperator-system/namespace: capz-system/g' \
 	> "$ASO_DST_DIR/aso-crds.yaml"
 echo "  - aso-crds.yaml" >> "$ASO_DST_K"
 

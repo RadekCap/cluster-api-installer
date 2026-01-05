@@ -63,14 +63,14 @@ build-cluster-api-provider-aws-chart:
 build-cluster-api-provider-azure-chart:
 	@echo "Building cluster-api-provider-azure chart"
 	WKDIR="$(WKDIR)" \
-	ORGREPO="$(STOLOSTRON_ORGREPO)" \
+	ORGREPO="https://github.com/marek-veber" \
 	PROJECT="cluster-api-provider-azure" \
-	BRANCH="$(CAPZ_BRANCH)" \
+	BRANCH="backplane-2.11-rebase" \
 	../scripts/build.sh
 	BUILTDIR="$(WKDIR)/cluster-api-provider-azure/config/tmp" \
 	CHART_VERSION="$(MCE_VERSION)" \
 	CHART_APP_VERSION="$(MCE_VERSION)" \
-	CHART_VALUES_IMAGE_TAG="$(MCE_VERSION)" \
+	CHART_VALUES_IMAGE_TAG="dev-aso.3.8" \
 	CHART_VALUES_IMAGE_TAG_PREFIX="" \
 	SYNC2CHARTS="$(SYNC2CHARTS)" \
 	PROJECT="cluster-api-provider-azure" \

@@ -15,7 +15,7 @@ spec:
       clientConfig:
         service:
           name: azureserviceoperator-webhook-service
-          namespace: azureserviceoperator-system
+          namespace: capz-system
           path: /convert
           port: 443
       conversionReviewVersions:
