@@ -1,13 +1,15 @@
-OCP_VERSION ?= 4.19
+OCP_VERSION ?= 4.21
+MCE_VERSION ?= 2.11.0-1
 SYNC2CHARTS ?= true
 
+DEFAULT_BRANCH ?= release-4.21
+CAPA_BRANCH ?= backplane-2.10
+CAPZ_BRANCH ?= backplane-2.11
 DEFAULT_ORGREPO ?= https://github.com/openshift
-CAPI_BRANCH=v1.11.0-alpha.2
-CAPA_BRANCH ?= main
+STOLOSTRON_ORGREPO ?= https://github.com/stolostron
 # needs overridable branch, as the non-master branch will differ
-OPENSHIFT_ASSISTED_BRANCH ?= master
-ASSISTED_BRANCH ?= master
-METAL3_BRANCH ?= main
+OPENSHIFT_ASSISTED_BRANCH ?= backplane-2.10
+METAL3_BRANCH ?= release-4.20
 
 OPENSHIFT_ASSISTED_ORGREPO ?= https://github.com/openshift-assisted
 
@@ -27,15 +29,15 @@ WKDIR ?= ../out
 build-cluster-api-chart:
 	@echo "Building cluster-api chart"
 	WKDIR="$(WKDIR)" \
-	ORGREPO="https://github.com/kubernetes-sigs" \
+	ORGREPO="$(DEFAULT_ORGREPO)" \
 	PROJECT="cluster-api" \
-	BRANCH="$(CAPI_BRANCH)" \
+	BRANCH="$(DEFAULT_BRANCH)" \
 	../scripts/build.sh
 	BUILTDIR="$(WKDIR)/cluster-api/config/tmp" \
 	CHART_VERSION="$(OCP_VERSION)" \
 	CHART_APP_VERSION="$(OCP_VERSION)" \
-	CHART_VALUES_IMAGE_TAG="$(CAPI_BRANCH)" \
-	CHART_VALUES_IMAGE_TAG_PREFIX="" \
+	CHART_VALUES_IMAGE_TAG="$(OCP_VERSION)" \
+	CHART_VALUES_IMAGE_TAG_PREFIX="v" \
 	SYNC2CHARTS="$(SYNC2CHARTS)" \
 	PROJECT="cluster-api" \
 	../scripts/sync2chart.sh
@@ -44,15 +46,15 @@ build-cluster-api-chart:
 build-cluster-api-provider-aws-chart:
 	@echo "Building cluster-api-provider-aws chart"
 	WKDIR="$(WKDIR)" \
-	ORGREPO="$(DEFAULT_ORGREPO)" \
+	ORGREPO="$(STOLOSTRON_ORGREPO)" \
 	PROJECT="cluster-api-provider-aws" \
 	BRANCH="$(CAPA_BRANCH)" \
 	../scripts/build.sh
 	BUILTDIR="$(WKDIR)/cluster-api-provider-aws/config/tmp" \
-	CHART_VERSION="$(OCP_VERSION)" \
-	CHART_APP_VERSION="$(OCP_VERSION)" \
-	CHART_VALUES_IMAGE_TAG="$(OCP_VERSION)" \
-	CHART_VALUES_IMAGE_TAG_PREFIX="v" \
+	CHART_VERSION="$(MCE_VERSION)" \
+	CHART_APP_VERSION="$(MCE_VERSION)" \
+	CHART_VALUES_IMAGE_TAG="$(MCE_VERSION)" \
+	CHART_VALUES_IMAGE_TAG_PREFIX="" \
 	SYNC2CHARTS="$(SYNC2CHARTS)" \
 	PROJECT="cluster-api-provider-aws" \
 	../scripts/sync2chart.sh
@@ -66,13 +68,14 @@ build-cluster-api-provider-azure-chart:
 	BRANCH="backplane-2.11-rebase" \
 	../scripts/build.sh
 	BUILTDIR="$(WKDIR)/cluster-api-provider-azure/config/tmp" \
-	CHART_VERSION="$(OCP_VERSION)" \
-	CHART_APP_VERSION="$(OCP_VERSION)" \
+	CHART_VERSION="$(MCE_VERSION)" \
+	CHART_APP_VERSION="$(MCE_VERSION)" \
 	CHART_VALUES_IMAGE_TAG="dev-aso.3.8" \
 	CHART_VALUES_IMAGE_TAG_PREFIX="" \
 	SYNC2CHARTS="$(SYNC2CHARTS)" \
 	PROJECT="cluster-api-provider-azure" \
 	../scripts/sync2chart.sh
+
 
 .PHONY: build-cluster-api-provider-openshift-assisted-chart
 build-cluster-api-provider-openshift-assisted-chart:
@@ -83,7 +86,7 @@ build-cluster-api-provider-openshift-assisted-chart:
 	ORGREPO="$(OPENSHIFT_ASSISTED_ORGREPO)" \
 	KUSTOMIZE_CONFIG_DIRS="bootstrap controlplane" \
 	PROJECT="cluster-api-provider-openshift-assisted" \
-	BRANCH="$(ASSISTED_BRANCH)" \
+	BRANCH="$(OPENSHIFT_ASSISTED_BRANCH)" \
 	../scripts/build.sh
 	BUILTDIR="$(WKDIR)/cluster-api-provider-openshift-assisted/config/tmp" \
 	CHART_VERSION="$(VERSION)" \
@@ -107,21 +110,18 @@ build-cluster-api-provider-metal3-chart:
 	CHART_VERSION="$(OCP_VERSION)" \
 	CHART_APP_VERSION="$(OCP_VERSION)" \
 	CHART_VALUES_IMAGE_TAG="$(TAG)" \
-	CHART_VALUES_IMAGE_TAG_PREFIX="" \
+	CHART_VALUES_IMAGE_TAG_PREFIX="v" \
 	SYNC2CHARTS="$(SYNC2CHARTS)" \
 	PROJECT="cluster-api-provider-metal3" \
 	../scripts/sync2chart.sh
 
 .PHONY: build
-build: build-cluster-api-chart build-cluster-api-provider-aws-chart build-cluster-api-azure-chart build-cluster-api-provider-metal3-chart build-cluster-api-provider-openshift-assisted-chart
+build: build-cluster-api-chart build-cluster-api-provider-aws-chart build-cluster-api-provider-azure-chart build-cluster-api-provider-metal3-chart build-cluster-api-provider-openshift-assisted-chart
 
 .PHONY: test-chart-crc
 test-chart-crc:
 	# run the deploy script with crc 
 	(cd ..; export PROJECT_ONLY=$(PROJECT) ; ./scripts/deploy-charts-crc.sh )
-
-.PHONY: build-cluster-api-azure-chart
-build-cluster-api-azure-chart: 
 
 .PHONY: release-chart
 release-chart:
