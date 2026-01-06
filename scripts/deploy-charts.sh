@@ -1,35 +1,68 @@
 #!/bin/bash
 set -e
 
-# This script deploys Helm charts to a Kubernetes cluster
-# Can be used standalone or sourced by other scripts
-#
-# Usage:
-#   ./deploy-charts.sh [chart1] [chart2] ...
-#
-# Environment variables:
-#   PROJECT_ONLY - If set, only deploy charts matching this project name
-#   KUBE_CONTEXT - kubectl context flags (e.g., "--context=kind-kind")
-#   CHARTS - Space-separated list of charts to deploy (default: cluster-api cluster-api-provider-azure)
-
-# Default charts if none specified
-DEFAULT_CHARTS="charts/cluster-api
-charts/cluster-api-provider-azure"
-
-# Use provided charts or command line args or defaults
-if [ $# -gt 0 ]; then
-    CHART_LIST="$@"
-elif [ -n "$CHARTS" ]; then
-    CHART_LIST="$CHARTS"
+if [ "$USE_KIND" = true ] ; then
+    CHART_SUFFIX="-kind"
+    KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-aso2}
+    KUBE_CONTEXT="--context=kind-$KIND_CLUSTER_NAME"
+    
+    if ! (kind get clusters 2>/dev/null|grep -q '^'"$KIND_CLUSTER_NAME"'$') ; then 
+        kind create cluster --name "$KIND_CLUSTER_NAME" --image="kindest/node:v1.31.0"
+        helm repo add jetstack https://charts.jetstack.io --force-update
+        helm repo update
+        helm upgrade --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set crds.enabled=true --wait --timeout 5m
+    fi
 else
-    CHART_LIST="$DEFAULT_CHARTS"
+    OCP_CONTEXT=${OCP_CONTEXT:-crc-admin}
+    KUBE_CONTEXT="--context=$OCP_CONTEXT"
 fi
 
-for CHART in $CHART_LIST; do
+function set_namespace_and_t {
+    case "$PROJECT" in
+      cluster-api)
+        T="capi"
+        NAMESPACE="capi-system"
+        ;;
+      cluster-api-provider-azure)
+        T="capz"
+        NAMESPACE="capz-system"
+        ;;
+      cluster-api-provider-aws)
+        T="capa"
+        NAMESPACE="capa-system"
+        ;;
+    esac
+}
+
+CHARTS=cluster-api
+[ "$USE_CAPZ" = true ] && CHARTS="$CHARTS cluster-api-provider-azure"
+
+for PROJECT in $CHARTS ; do
+    CHART="charts/$PROJECT$CHART_SUFFIX"
     [ -f $CHART/Chart.yaml ] || continue
-    PROJECT=${CHART#charts/}
-    [ -z "$PROJECT_ONLY" -o "$PROJECT_ONLY" == "$PROJECT" ] || continue
+    set_namespace_and_t
     echo ========= deploy: $CHART
-    helm template $CHART --include-crds|kubectl $KUBE_CONTEXT apply -f - --server-side --force-conflicts
+    echo "        PROJECT: $PROJECT"
+    echo "      NAMESPACE: $NAMESPACE"
+    helm template $CHART --include-crds --namespace "$NAMESPACE" |kubectl $KUBE_CONTEXT apply -f - --server-side --force-conflicts
     echo
 done
+
+
+for PROJECT in $CHARTS ; do
+    CHART="charts/$PROJECT$CHART_SUFFIX"
+    [ -f $CHART/Chart.yaml ] || continue
+    set_namespace_and_t
+    echo "Waiting for ${T} controller (in $NAMESPACE namespace):"
+    kubectl $KUBE_CONTEXT events -n "$NAMESPACE" --watch &
+    CH_PID=$!
+    kubectl $KUBE_CONTEXT -n "$NAMESPACE" wait deployment/${T}-controller-manager --for condition=Available=True  --timeout=10m
+    if [ "${T}" = capz ] ; then
+        kubectl $KUBE_CONTEXT -n "$NAMESPACE" wait deployment/azureserviceoperator-controller-manager --for condition=Available=True  --timeout=10m
+    fi
+    kill $CH_PID
+    echo
+done
+
+
+
