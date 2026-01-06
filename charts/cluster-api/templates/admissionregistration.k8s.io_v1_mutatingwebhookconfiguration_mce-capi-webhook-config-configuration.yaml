@@ -2,7 +2,7 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
   annotations:
-    cert-manager.io/inject-ca-from: capi-system/mce-capi-webhook-config
+    service.beta.openshift.io/inject-cabundle: "true"
   creationTimestamp: null
   name: mce-capi-webhook-config-configuration
 webhooks:
