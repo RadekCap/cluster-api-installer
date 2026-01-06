@@ -1,17 +1,15 @@
 #!/bin/bash
 set -e
+DO_INIT_KIND=${INIT_KIND:-true}
+DO_DEPLOY=${DO_DEPLOY:-true}
+DO_CHECK=${DO_CHECK:-true}
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 if [ "$USE_KIND" = true ] ; then
     CHART_SUFFIX="-kind"
     KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-aso2}
     KUBE_CONTEXT="--context=kind-$KIND_CLUSTER_NAME"
-    
-    if ! (kind get clusters 2>/dev/null|grep -q '^'"$KIND_CLUSTER_NAME"'$') ; then 
-        kind create cluster --name "$KIND_CLUSTER_NAME" --image="kindest/node:v1.31.0"
-        helm repo add jetstack https://charts.jetstack.io --force-update
-        helm repo update
-        helm upgrade --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set crds.enabled=true --wait --timeout 5m
-    fi
+    [ "$DO_INIT_KIND" = true ] && ${SCRIPT_DIR}/setup-kind-cluster.sh
 else
     OCP_CONTEXT=${OCP_CONTEXT:-crc-admin}
     KUBE_CONTEXT="--context=$OCP_CONTEXT"
@@ -34,35 +32,42 @@ function set_namespace_and_t {
     esac
 }
 
-CHARTS=cluster-api
-[ "$USE_CAPZ" = true ] && CHARTS="$CHARTS cluster-api-provider-azure"
+CHARTS=$(echo cluster-api $*|tr ' ' '\n'|sort -u|tr '\n' ' ')
 
-for PROJECT in $CHARTS ; do
-    CHART="charts/$PROJECT$CHART_SUFFIX"
-    [ -f $CHART/Chart.yaml ] || continue
-    set_namespace_and_t
-    echo ========= deploy: $CHART
-    echo "        PROJECT: $PROJECT"
-    echo "      NAMESPACE: $NAMESPACE"
-    helm template $CHART --include-crds --namespace "$NAMESPACE" |kubectl $KUBE_CONTEXT apply -f - --server-side --force-conflicts
-    echo
-done
+if [ "$DO_DEPLOY" = true ] ; then
+    for PROJECT in $CHARTS ; do
+        CHART="charts/$PROJECT$CHART_SUFFIX"
+        [ -f $CHART/Chart.yaml ] || continue
+        set_namespace_and_t
+        echo ========= deploy: $CHART
+        echo "        PROJECT: $PROJECT"
+        echo "      NAMESPACE: $NAMESPACE"
+        helm template $CHART --include-crds --namespace "$NAMESPACE" |kubectl $KUBE_CONTEXT apply -f - --server-side --force-conflicts
+        echo
+    done
+fi
 
 
-for PROJECT in $CHARTS ; do
-    CHART="charts/$PROJECT$CHART_SUFFIX"
-    [ -f $CHART/Chart.yaml ] || continue
-    set_namespace_and_t
-    echo "Waiting for ${T} controller (in $NAMESPACE namespace):"
-    kubectl $KUBE_CONTEXT events -n "$NAMESPACE" --watch &
-    CH_PID=$!
-    kubectl $KUBE_CONTEXT -n "$NAMESPACE" wait deployment/${T}-controller-manager --for condition=Available=True  --timeout=10m
-    if [ "${T}" = capz ] ; then
-        kubectl $KUBE_CONTEXT -n "$NAMESPACE" wait deployment/azureserviceoperator-controller-manager --for condition=Available=True  --timeout=10m
-    fi
-    kill $CH_PID
-    echo
-done
-
+if [ "$DO_CHECK" = true ] ; then
+    for PROJECT in $CHARTS ; do
+        CHART="charts/$PROJECT$CHART_SUFFIX"
+        [ -f $CHART/Chart.yaml ] || continue
+        set_namespace_and_t
+        echo "Waiting for ${T} controller (in $NAMESPACE namespace):"
+        kubectl $KUBE_CONTEXT events -n "$NAMESPACE" --watch &
+        CH_PID=$!
+        kubectl $KUBE_CONTEXT -n "$NAMESPACE" wait deployment/${T}-controller-manager --for condition=Available=True  --timeout=10m
+        if [ "${T}" = capz ] ; then
+            echo "Waiting for azureserviceoperator controller (in $NAMESPACE namespace):"
+            kubectl $KUBE_CONTEXT -n "$NAMESPACE" wait deployment/azureserviceoperator-controller-manager --for condition=Available=True  --timeout=10m
+        fi
+        if [ "${T}" = capi ] ; then
+            echo "Waiting for mce-capi-webhook-config controller (in $NAMESPACE namespace):"
+            kubectl $KUBE_CONTEXT -n "$NAMESPACE" wait deployment/mce-capi-webhook-config --for condition=Available=True  --timeout=10m
+        fi
+        kill $CH_PID
+        echo
+    done
+fi
 
 
