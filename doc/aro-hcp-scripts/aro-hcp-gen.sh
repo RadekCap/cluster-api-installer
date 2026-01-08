@@ -58,7 +58,7 @@ if [ -n "$OICD_RESOURCE_GROUP" ] ; then
     # az role assignment create --assignee  "${AZURE_PRINCIPAL_ID}" --role Contributor --scope "/subscriptions/${AZURE_SUBSCRIPTION_ID}"
 else
     SP_JSON_FILE="sp-$AZURE_SUBSCRIPTION_ID.json"
-    if [ ! -f "$SP_JSON_FILE" ] ; then
+    if [ ! -s "$SP_JSON_FILE" ] ; then
         let "randomIdentifier=$RANDOM*$RANDOM"
         servicePrincipalName="$USER-sp-$randomIdentifier"
         #roleName="Contributor"
