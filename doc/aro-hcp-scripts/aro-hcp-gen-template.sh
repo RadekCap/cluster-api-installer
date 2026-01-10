@@ -691,7 +691,7 @@ metadata:
  name: \${CS_CLUSTER_NAME}-mp-0
  namespace: default
 spec:
-  nodePoolName: w-\${REGION}-mp-0
+  nodePoolName: \${CS_CLUSTER_NAME}-mp-0
   version: "\${OCP_VERSION_MP}"
   platform:
     subnet: "/subscriptions/\${AZURE_SUBSCRIPTION_ID}/resourceGroups/\${RESOURCEGROUPNAME}/providers/Microsoft.Network/virtualNetworks/\${VNET}/subnets/\${SUBNET}"

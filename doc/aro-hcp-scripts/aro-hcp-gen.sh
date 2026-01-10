@@ -45,7 +45,7 @@ export RESOURCEGROUPNAME="$CS_CLUSTER_NAME-resgroup"
 export OCP_VERSION=${OCP_VERSION:-4.19}
 export OCP_VERSION_MP=${OCP_VERSION_MP:-$OCP_VERSION.0}
 export REGION=${REGION:-westus3}
-export NODEPOOL_PREFIX="w-${REGION:0:7}"
+export NODEPOOL_PREFIX="${CS_CLUSTER_NAME}"
 
 if [ -n "$OICD_RESOURCE_GROUP" ] ; then
     export AZURE_ASO_TENANT_ID=$(az identity show --query tenantId --output=tsv --resource-group="${OICD_RESOURCE_GROUP}" --name="${USER_ASSIGNED_IDENTITY_ASO}" --subscription "$AZURE_SUBSCRIPTION_NAME")
